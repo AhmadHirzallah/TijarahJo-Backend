@@ -1,0 +1,12 @@
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\bin\Debug\net8.0\Domain.deps.json
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\bin\Debug\net8.0\Domain.dll
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\bin\Debug\net8.0\Domain.pdb
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\obj\Debug\net8.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\obj\Debug\net8.0\Domain.AssemblyInfoInputs.cache
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\obj\Debug\net8.0\Domain.AssemblyInfo.cs
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\obj\Debug\net8.0\Domain.csproj.CoreCompileInputs.cache
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\obj\Debug\net8.0\Domain.sourcelink.json
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\obj\Debug\net8.0\Domain.dll
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\obj\Debug\net8.0\refint\Domain.dll
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\obj\Debug\net8.0\Domain.pdb
+E:\Dash Board\Projects\TijarahJo\Backend\TijarahJo-Backend\Domain\obj\Debug\net8.0\ref\Domain.dll

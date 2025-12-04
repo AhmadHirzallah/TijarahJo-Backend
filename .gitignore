@@ -1,0 +1,4 @@
+# Ignore Visual Studio workspace and content index files
+TijarahJo-Backend/.vs/
+*.vsidx
+
