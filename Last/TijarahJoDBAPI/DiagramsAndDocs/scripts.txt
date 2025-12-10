@@ -59,9 +59,9 @@ CREATE TABLE dbo.TbItemCategories (
 GO
 
 ------------------------------------------------------------
--- 4. TbUserPosts
+-- 4. TbPosts
 ------------------------------------------------------------
-CREATE TABLE dbo.TbUserPosts (
+CREATE TABLE dbo.TbPosts (
     PostID          INT IDENTITY(1,1) CONSTRAINT PK_TbUserPosts PRIMARY KEY,
     UserID          INT          NOT NULL,
     CategoryID      INT          NOT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE dbo.TbPostImages (
     UploadedAt   DATETIME2     NOT NULL CONSTRAINT DF_TbPostImages_UploadedAt DEFAULT SYSDATETIME(),
     IsDeleted    BIT           NOT NULL CONSTRAINT DF_TbPostImages_IsDeleted DEFAULT 0,
     CONSTRAINT FK_TbPostImages_PostID FOREIGN KEY (PostID)
-        REFERENCES dbo.TbUserPosts(PostID)
+        REFERENCES dbo.TbPosts(PostID)
 );
 GO
 
@@ -126,7 +126,7 @@ VALUES
 GO
 
 -- 6.4 User posts (sample)
-INSERT INTO dbo.TbUserPosts (UserID, CategoryID, PostTitle, PostDescription, Price, Status)
+INSERT INTO dbo.TbPosts (UserID, CategoryID, PostTitle, PostDescription, Price, Status)
 VALUES
 (2, 1, 'iPhone 13 for Sale', 'Gently used, 128GB, blue color', 550.00, 1),
 (2, 4, 'Freelance Web Design', 'Offering professional website design services', 0.00, 2);
@@ -149,9 +149,9 @@ CREATE INDEX IX_TbUsers_RoleID          ON dbo.TbUsers (RoleID);
 CREATE INDEX IX_TbUsers_Username          ON dbo.TbUsers (Username);
 CREATE INDEX IX_TbUsers_Status          ON dbo.TbUsers(Status);
 
-CREATE INDEX IX_TbUserPosts_UserID      ON dbo.TbUserPosts (UserID);
-CREATE INDEX IX_TbUserPosts_CategoryID  ON dbo.TbUserPosts (CategoryID);
-CREATE INDEX IX_TbUserPosts_Status      ON dbo.TbUserPosts (Status);
+CREATE INDEX IX_TbUserPosts_UserID      ON dbo.TbPosts (UserID);
+CREATE INDEX IX_TbUserPosts_CategoryID  ON dbo.TbPosts (CategoryID);
+CREATE INDEX IX_TbUserPosts_Status      ON dbo.TbPosts (Status);
 
 CREATE INDEX IX_TbItemCategories_Name   ON dbo.TbItemCategories (CategoryName);
 

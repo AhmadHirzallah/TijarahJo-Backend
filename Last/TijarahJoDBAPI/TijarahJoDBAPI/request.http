@@ -1,0 +1,11 @@
+@baseUrl = https://localhost:5033
+ 
+###
+{{baseUrl}}/
+
+###
+GET {{baseUrl}}/api/TbPosts/pagination?pageNumber=2&rowsPerPage=5&includeDeleted=false
+
+
+###
+GET {{baseUrl}}/api/posts/pagination?pageNumber=2&rowsPerPage=5&includeDeleted=false
