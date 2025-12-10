@@ -2,3 +2,6 @@
 TijarahJo-Backend/.vs/
 *.vsidx
 
+# Build output
+bin/
+obj/
