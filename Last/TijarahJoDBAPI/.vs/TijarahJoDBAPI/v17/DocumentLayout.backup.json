@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\Last\\TijarahJoDBAPI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\last\\tijarahjodbapi\\models\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|solutionrelative:models\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D3C4684-6E74-4442-AD91-A494A4A85E32}|BLL\\BLL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\last\\tijarahjodbapi\\bll\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D3C4684-6E74-4442-AD91-A494A4A85E32}|BLL\\BLL.csproj|solutionrelative:bll\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\last\\tijarahjodbapi\\dal\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|solutionrelative:dal\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\Last\\TijarahJoDBAPI\\Models\\Class1.cs",
+              "RelativeDocumentMoniker": "Models\\Class1.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\Last\\TijarahJoDBAPI\\Models\\Class1.cs",
+              "RelativeToolTip": "Models\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-10T18:48:09.448Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\Last\\TijarahJoDBAPI\\BLL\\Class1.cs",
+              "RelativeDocumentMoniker": "BLL\\Class1.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\Last\\TijarahJoDBAPI\\BLL\\Class1.cs",
+              "RelativeToolTip": "BLL\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-10T18:47:46.451Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\Last\\TijarahJoDBAPI\\DAL\\Class1.cs",
+              "RelativeDocumentMoniker": "DAL\\Class1.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\Last\\TijarahJoDBAPI\\DAL\\Class1.cs",
+              "RelativeToolTip": "DAL\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-10T18:47:21.449Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
