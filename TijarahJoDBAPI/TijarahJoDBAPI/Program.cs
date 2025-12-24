@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen();
 
 // To-do
 /*
+*/
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -49,10 +50,10 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-*/
 
 // To-do-- A Lot
 /*
+*/
 
 // 
 // To-do
@@ -99,7 +100,6 @@ builder.Services.AddAuthentication(options => {
            };
        });
 
-*/
 
 
 // Done

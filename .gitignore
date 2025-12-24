@@ -5,7 +5,3 @@ TijarahJo-Backend/.vs/
 # Build output
 bin/
 obj/
-
-**/LoginRequest.cs
-**/JwtOptions.cs
-**/TokenService.cs

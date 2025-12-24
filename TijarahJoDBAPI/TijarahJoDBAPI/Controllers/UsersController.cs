@@ -9,8 +9,8 @@ namespace TijarahJoDBAPI.Controllers
 	[ApiController]
 	[Route("api/TbUsers")]
     // To-do
-	//public class UsersController(/*JwtOptions jwtOptions,*/ TokenService tokenService) : ControllerBase
-	public class UsersController() : ControllerBase
+	public class UsersController(/*JwtOptions jwtOptions,*/ TokenService tokenService) : ControllerBase
+	//public class UsersController() : ControllerBase
 	{
 
         [HttpGet("All", Name = "GetAllTbUsers")]
@@ -155,7 +155,6 @@ namespace TijarahJoDBAPI.Controllers
 		}
 
 
-		/*/
 
 			// To-do
         [HttpPost("login", Name = "Login")]
@@ -201,6 +200,7 @@ namespace TijarahJoDBAPI.Controllers
 			/// Axios always with .data
             return Ok(new { User = user.UserModel, Token });
         }
+		/*
 		*/
 
 
@@ -209,7 +209,6 @@ namespace TijarahJoDBAPI.Controllers
 
         // To-do
 		//[Authorize]
-
 		[HttpDelete("{id}", Name = "DeleteUser")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
