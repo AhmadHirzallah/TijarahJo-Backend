@@ -12,9 +12,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-// To-do
-/*
-*/
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -51,12 +48,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// To-do-- A Lot
-/*
-*/
 
 // 
-// To-do
 ///
 /// @brief from appsettings.Development.json 
 /// Get - Deserialize section "JWT" to JwtOptions class
@@ -64,13 +57,10 @@ builder.Services.AddSwaggerGen(c =>
 var jwtOption = builder.Configuration.GetSection("JWT").Get<JwtOptions>();
 
 
-// To-do
-//builder.Services.AddSingleton(jwtOption); // Only one  for all the program lifetime
+builder.Services.AddSingleton(jwtOption); // Only one  for all the program lifetime
 
-// To-do
-//builder.Services.AddScoped<TokenService>(); // Only one  for all the program lifetime
+builder.Services.AddScoped<TokenService>(); // Only one  for all the program lifetime
 
-// To-do
 builder.Services.AddAuthentication(options => {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

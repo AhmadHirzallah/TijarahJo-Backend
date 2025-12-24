@@ -207,7 +207,6 @@ namespace TijarahJoDBAPI.Controllers
 
 
 
-        // To-do
 		//[Authorize]
 		[HttpDelete("{id}", Name = "DeleteUser")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
