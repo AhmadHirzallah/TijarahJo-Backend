@@ -1,233 +1,213 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using System.Collections.Generic;
 using TijarahJoDB.BLL;
-using TijarahJoDB.DAL;
 using TijarahJoDBAPI.DTOs.Requests;
+using TijarahJoDBAPI.DTOs.Responses;
+using TijarahJoDBAPI.DTOs.Mappers;
 
 namespace TijarahJoDBAPI.Controllers
 {
+    [ApiController]
+    [Route("api/TbPosts")]
+    public class UserPostsController : ControllerBase
+    {
+        [HttpGet("All", Name = "GetAllTbUserPosts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<IEnumerable<PostResponse>> GetAllTbUserPosts()
+        {
+            var tbuserpostsList = Post.GetAllTbUserPosts();
 
-	[ApiController]
-	[Route("api/TbPosts")]
-	public class UserPostsController : ControllerBase
-	{
+            if (tbuserpostsList == null || tbuserpostsList.Rows.Count == 0)
+            {
+                return NotFound("No TbPosts Found!");
+            }
 
-		[HttpGet("All", Name = "GetAllTbUserPosts")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public ActionResult<IEnumerable<PostModel>> GetAllTbUserPosts()
-		{
-			var tbuserpostsList = Post.GetAllTbUserPosts();
+            var responseList = new List<PostResponse>();
 
-			if (tbuserpostsList == null || tbuserpostsList.Rows.Count == 0)
-			{
-				return NotFound("No TbPosts Found!");
-			}
+            foreach (System.Data.DataRow row in tbuserpostsList.Rows)
+            {
+                responseList.Add(new PostResponse
+                {
+                    PostID = (int?)row["PostID"],
+                    UserID = (int)row["UserID"],
+                    CategoryID = (int)row["CategoryID"],
+                    PostTitle = (string)row["PostTitle"],
+                    PostDescription = row["PostDescription"] == DBNull.Value ? null : (string)row["PostDescription"],
+                    Price = row["Price"] == DBNull.Value ? null : (decimal?)row["Price"],
+                    Status = (int)row["Status"],
+                    CreatedAt = (DateTime)row["CreatedAt"],
+                    IsDeleted = (bool)row["IsDeleted"]
+                });
+            }
 
-			var dtoList = new List<PostModel>();
+            return Ok(responseList);
+        }
 
-			foreach (System.Data.DataRow row in tbuserpostsList.Rows)
-			{
-				dtoList.Add(new PostModel
-				(
-					(int?)row["PostID"],
-					(int)row["UserID"],
-					(int)row["CategoryID"],
-					(string)row["PostTitle"],
-					(string)row["PostDescription"],
-					(decimal?)row["Price"],
-					(int)row["Status"],
-					(DateTime)row["CreatedAt"],
-					(bool)row["IsDeleted"]
-				));
-			}
+        [HttpGet("pagination", Name = "GetPostsPaginated")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<IEnumerable<PostResponse>> GetPaginated([FromQuery] GetPaginatedRequest request)
+        {
+            var tbuserpostsList = Post.GetPaginated(
+                request.PageNumber,
+                request.RowsPerPage,
+                request.IncludeDeleted);
 
-			return Ok(dtoList);
-		}
+            if (tbuserpostsList == null || tbuserpostsList.Rows.Count == 0)
+            {
+                return NotFound("No TbPosts Found!");
+            }
 
+            var responseList = new List<PostResponse>();
 
+            foreach (System.Data.DataRow row in tbuserpostsList.Rows)
+            {
+                responseList.Add(new PostResponse
+                {
+                    PostID = (int?)row["PostID"],
+                    UserID = (int)row["UserID"],
+                    CategoryID = (int)row["CategoryID"],
+                    PostTitle = (string)row["PostTitle"],
+                    PostDescription = row["PostDescription"] == DBNull.Value ? null : (string)row["PostDescription"],
+                    Price = row["Price"] == DBNull.Value ? null : (decimal?)row["Price"],
+                    Status = (int)row["Status"],
+                    CreatedAt = (DateTime)row["CreatedAt"],
+                    IsDeleted = (bool)row["IsDeleted"]
+                });
+            }
 
-		[HttpGet("pagination", Name = "GetPostsPaginated")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public ActionResult<IEnumerable<PostModel>> GetPaginated([FromQuery] 
-														GetPaginatedRequest getPaginatedRequest)
-		{
-			var tbuserpostsList = Post.GetPaginated(
-				getPaginatedRequest.PageNumber,
-				getPaginatedRequest.RowsPerPage,
-				getPaginatedRequest.IncludeDeleted);
+            return Ok(responseList);
+        }
 
-			if (tbuserpostsList == null || tbuserpostsList.Rows.Count == 0)
-			{
-				return NotFound("No TbPosts Found!");
-			}
+        [HttpGet("{id}", Name = "GetPostById")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<PostResponse> GetPostById(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest($"Not accepted ID {id}");
+            }
 
-			var dtoList = new List<PostModel>();
+            Post post = Post.Find(id);
 
-			foreach (System.Data.DataRow row in tbuserpostsList.Rows)
-			{
-				dtoList.Add(new PostModel
-				(
-					(int?)row["PostID"],
-					(int)row["UserID"],
-					(int)row["CategoryID"],
-					(string)row["PostTitle"],
-					(string)row["PostDescription"],
-					(decimal?)row["Price"],
-					(int)row["Status"],
-					(DateTime)row["CreatedAt"],
-					(bool)row["IsDeleted"]
-				));
-			}
+            if (post == null)
+            {
+                return NotFound($"Post with ID {id} not found.");
+            }
 
-			return Ok(dtoList);
-		}
+            return Ok(post.PostModel.ToResponse());
+        }
 
+        [HttpPost(Name = "AddPost")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<PostResponse> AddPost([FromBody] CreatePostRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            Post post = new Post(new PostModel
+            (
+                null, // PostID - will be generated
+                request.UserID,
+                request.CategoryID,
+                request.PostTitle,
+                request.PostDescription,
+                request.Price,
+                request.Status,
+                DateTime.UtcNow, // CreatedAt
+                false // IsDeleted
+            ));
 
-		[HttpGet("{id}", Name = "GetPostById")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public ActionResult<PostModel> GetPostById(int id)
-		{
-			if (id < 1)
-			{
-				return BadRequest($"Not accepted ID {id}");
-			}
+            if (!post.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error adding Post");
+            }
 
-			Post post = Post.Find(id);
+            var response = post.PostModel.ToResponse();
 
-			if (post == null)
-			{
-				return NotFound($"Post with ID {id} not found.");
-			}
+            return CreatedAtRoute("GetPostById", new { id = response.PostID }, response);
+        }
 
-			PostModel dto = post.PostModel;
+        [HttpPut("{id}", Name = "UpdatePost")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<PostResponse> UpdatePost(int id, [FromBody] UpdatePostRequest request)
+        {
+            if (id < 1)
+            {
+                return BadRequest($"Not accepted ID {id}");
+            }
 
-			return Ok(dto);
-		}
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            Post post = Post.Find(id);
 
+            if (post == null)
+            {
+                return NotFound($"Post with ID {id} not found.");
+            }
 
-		//[Authorize]
+            post.UserID = request.UserID;
+            post.CategoryID = request.CategoryID;
+            post.PostTitle = request.PostTitle;
+            post.PostDescription = request.PostDescription;
+            post.Price = request.Price;
+            post.Status = request.Status;
+            post.IsDeleted = request.IsDeleted;
 
-		[HttpPost(Name = "AddPost")]
-		[ProducesResponseType(StatusCodes.Status201Created)]
-		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public ActionResult<PostModel> AddPost(PostModel newPostDTO)
-		{
-			if (newPostDTO == null || newPostDTO.UserID < 0 || newPostDTO.CategoryID < 0 || string.IsNullOrEmpty(newPostDTO.PostTitle) || newPostDTO.Status < 0)
-			{
-				return BadRequest("Invalid Post data.");
-			}
+            if (!post.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating Post");
+            }
 
-			Post post = new Post(new PostModel
-			(
-					newPostDTO.PostID,
-					newPostDTO.UserID,
-					newPostDTO.CategoryID,
-					newPostDTO.PostTitle,
-					newPostDTO.PostDescription,
-					newPostDTO.Price,
-					newPostDTO.Status,
-					newPostDTO.CreatedAt,
-					newPostDTO.IsDeleted
-			));
+            return Ok(post.PostModel.ToResponse());
+        }
 
-			if (!post.Save())
-			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error adding Post");
-			}
+        [HttpDelete("{id}", Name = "DeletePost")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult DeletePost(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest($"Not accepted ID {id}");
+            }
 
-			newPostDTO.PostID = post.PostID;
+            if (Post.DeletePost(id))
+            {
+                return Ok($"Post with ID {id} has been deleted.");
+            }
+            else
+            {
+                return NotFound($"Post with ID {id} not found. No rows deleted!");
+            }
+        }
 
-			return CreatedAtRoute("GetPostById", new { id = newPostDTO.PostID }, newPostDTO);
-		}
+        [HttpGet("Exists/{id}", Name = "DoesPostExist")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> DoesPostExist(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest($"Not accepted ID {id}");
+            }
 
+            bool exists = Post.DoesPostExist(id);
 
-
-		[HttpPut("{id}", Name = "UpdatePost")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public ActionResult<PostModel> UpdatePost(int id, PostModel updatedPost)
-		{
-			if (id < 1 || updatedPost == null || updatedPost.UserID < 0 || updatedPost.CategoryID < 0 || string.IsNullOrEmpty(updatedPost.PostTitle) || updatedPost.Status < 0)
-			{
-				return BadRequest("Invalid Post data.");
-			}
-
-			Post post = Post.Find(id);
-
-			if (post == null)
-			{
-				return NotFound($"Post with ID {id} not found.");
-			}
-
-			post.UserID = updatedPost.UserID;
-			post.CategoryID = updatedPost.CategoryID;
-			post.PostTitle = updatedPost.PostTitle;
-			post.PostDescription = updatedPost.PostDescription;
-			post.Price = updatedPost.Price;
-			post.Status = updatedPost.Status;
-			post.CreatedAt = updatedPost.CreatedAt;
-			post.IsDeleted = updatedPost.IsDeleted;
-
-			if (!post.Save())
-			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error updating Post");
-			}
-
-			return Ok(post.PostModel);
-		}
-
-
-
-
-		[HttpDelete("{id}", Name = "DeletePost")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public ActionResult DeletePost(int id)
-		{
-			if (id < 1)
-			{
-				return BadRequest($"Not accepted ID {id}");
-			}
-
-			if (Post.DeletePost(id))
-			{
-				return Ok($"Post with ID {id} has been deleted.");
-			}
-			else
-			{
-				return NotFound($"Post with ID {id} not found. No rows deleted!");
-			}
-		}
-
-
-
-
-
-		[HttpGet("Exists/{id}", Name = "DoesPostExist")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public ActionResult<bool> DoesPostExist(int id)
-		{
-			if (id < 1)
-			{
-				return BadRequest($"Not accepted ID {id}");
-			}
-
-			bool exists = Post.DoesPostExist(id);
-
-			return Ok(exists);
-		}
-
-
-	}
+            return Ok(exists);
+        }
+    }
 }

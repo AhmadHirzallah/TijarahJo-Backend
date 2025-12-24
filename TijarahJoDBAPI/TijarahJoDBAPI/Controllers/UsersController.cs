@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using TijarahJoDB.BLL;
 using Models;
 using Microsoft.AspNetCore.Authorization;
+using TijarahJoDBAPI.DTOs.Requests;
+using TijarahJoDBAPI.DTOs.Responses;
+using TijarahJoDBAPI.DTOs.Mappers;
 
 namespace TijarahJoDBAPI.Controllers
 {
 	[ApiController]
 	[Route("api/TbUsers")]
-	public class UsersController(/*JwtOptions jwtOptions,*/ TokenService tokenService) : ControllerBase
-	//public class UsersController() : ControllerBase
+	public class UsersController(TokenService tokenService) : ControllerBase
 	{
 
         [HttpGet("All", Name = "GetAllTbUsers")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public ActionResult<IEnumerable<UserModel>> GetAllTbUsers()
+		public ActionResult<IEnumerable<UserResponse>> GetAllTbUsers()
 		{
 			var tbusersList = UserBL.GetAllTbUsers();
 
@@ -24,33 +26,32 @@ namespace TijarahJoDBAPI.Controllers
 				return NotFound("No TbUsers Found!");
 			}
 
-			var dtoList = new List<UserModel>();
+			var responseList = new List<UserResponse>();
 
 			foreach (System.Data.DataRow row in tbusersList.Rows)
 			{
-				dtoList.Add(new UserModel
-				(
-					(int?)row["UserID"],
-					(string)row["Username"],
-					(string)row["HashedPassword"],
-					(string)row["Email"],
-					(string)row["FirstName"],
-					(string)row["LastName"],
-					(DateTime)row["JoinDate"],
-					(int)row["Status"],
-					(int)row["RoleID"],
-					(bool)row["IsDeleted"]
-				));
+				responseList.Add(new UserResponse
+				{
+					UserID = (int?)row["UserID"],
+					Username = (string)row["Username"],
+					Email = (string)row["Email"],
+					FirstName = (string)row["FirstName"],
+					LastName = row["LastName"] == DBNull.Value ? null : (string)row["LastName"],
+					JoinDate = (DateTime)row["JoinDate"],
+					Status = (int)row["Status"],
+					RoleID = (int)row["RoleID"],
+					IsDeleted = (bool)row["IsDeleted"]
+				});
 			}
 
-			return Ok(dtoList);
+			return Ok(responseList);
 		}
 
 		[HttpGet("{id}", Name = "GetUserById")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public ActionResult<UserModel> GetUserById(int id)
+		public ActionResult<UserResponse> GetUserById(int id)
 		{
 			if (id < 1)
 			{
@@ -61,12 +62,10 @@ namespace TijarahJoDBAPI.Controllers
 
 			if (user == null)
 			{
-				return NotFound($"UserBL with ID {id} not found.");
+				return NotFound($"User with ID {id} not found.");
 			}
 
-			UserModel dto = user.UserModel;
-
-			return Ok(dto); // In axios -> response.data .. so u can do: ....Username
+			return Ok(user.UserModel.ToResponse());
         }
 
 
@@ -74,43 +73,35 @@ namespace TijarahJoDBAPI.Controllers
 		[HttpPost(Name = "Register")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public ActionResult<UserModel> Register(UserModel newUserModel)
+		public ActionResult<UserResponse> Register([FromBody] CreateUserRequest request)
 		{
-			if (newUserModel == null || string.IsNullOrEmpty(newUserModel.Username) || string.IsNullOrEmpty(newUserModel.HashedPassword) || string.IsNullOrEmpty(newUserModel.Email) || string.IsNullOrEmpty(newUserModel.FirstName) || newUserModel.Status < 0 || newUserModel.RoleID < 0)
+			if (!ModelState.IsValid)
 			{
-				return BadRequest("Invalid UserBL data.");
+				return BadRequest(ModelState);
 			}
 
 			UserBL user = new UserBL(new UserModel
 			(
-					newUserModel.UserID,
-					newUserModel.Username,
-					newUserModel.HashedPassword,
-					newUserModel.Email,
-					newUserModel.FirstName,
-					newUserModel.LastName,
-					newUserModel.JoinDate,
-					newUserModel.Status,
-					newUserModel.RoleID,
-					newUserModel.IsDeleted
+				null, // UserID - will be generated
+				request.Username,
+				request.Password, // Note: Should be hashed before storing
+				request.Email,
+				request.FirstName,
+				request.LastName,
+				DateTime.UtcNow, // JoinDate
+				request.Status,
+				request.RoleID,
+				false // IsDeleted
 			));
 
 			if (!user.Save())
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error adding UserBL");
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error adding User");
 			}
 
-			newUserModel.UserID = user.UserID;
+			var response = user.UserModel.ToResponse();
 
-			// To-do
-			//string Token = tokenService.CreateAuthToken(user.UserID);
-
-            /// Axios in Frontend ... You will receive object and AXIOS reponse.data.User and response.data.Token
-			/// reponse.data.User.UserName , Password, 
-			/// Axios always with .data
-			// To-do
-            //return CreatedAtRoute("GetUserById", new { id = newUserModel.UserID }, new { User = user.UserModel, Token });
-            return CreatedAtRoute("GetUserById", new { id = newUserModel.UserID });
+			return CreatedAtRoute("GetUserById", new { id = response.UserID }, response);
 		}
 
 
@@ -121,36 +112,40 @@ namespace TijarahJoDBAPI.Controllers
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public ActionResult<UserModel> UpdateUser(int id, UserModel updatedUser)
+		public ActionResult<UserResponse> UpdateUser(int id, [FromBody] UpdateUserRequest request)
 		{
-			if (id < 1 || updatedUser == null || string.IsNullOrEmpty(updatedUser.Username) || string.IsNullOrEmpty(updatedUser.HashedPassword) || string.IsNullOrEmpty(updatedUser.Email) || string.IsNullOrEmpty(updatedUser.FirstName) || updatedUser.Status < 0 || updatedUser.RoleID < 0)
+			if (id < 1)
 			{
-				return BadRequest("Invalid UserBL data.");
+				return BadRequest($"Not accepted ID {id}");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
 			}
 
 			UserBL user = UserBL.Find(id);
 
 			if (user == null)
 			{
-				return NotFound($"UserBL with ID {id} not found.");
+				return NotFound($"User with ID {id} not found.");
 			}
 
-			user.Username = updatedUser.Username;
-			user.HashedPassword = updatedUser.HashedPassword;
-			user.Email = updatedUser.Email;
-			user.FirstName = updatedUser.FirstName;
-			user.LastName = updatedUser.LastName;
-			user.JoinDate = updatedUser.JoinDate;
-			user.Status = updatedUser.Status;
-			user.RoleID = updatedUser.RoleID;
-			user.IsDeleted = updatedUser.IsDeleted;
+			user.Username = request.Username;
+			user.HashedPassword = request.Password; // Note: Should be hashed
+			user.Email = request.Email;
+			user.FirstName = request.FirstName;
+			user.LastName = request.LastName;
+			user.Status = request.Status;
+			user.RoleID = request.RoleID;
+			user.IsDeleted = request.IsDeleted;
 
 			if (!user.Save())
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error updating UserBL");
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error updating User");
 			}
 
-			return Ok(user.UserModel);
+			return Ok(user.UserModel.ToResponse());
 		}
 
 
@@ -160,13 +155,11 @@ namespace TijarahJoDBAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult<UserModel> Login([FromBody] LoginRequest request)
+        public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
         {
-            if (request == null ||
-                string.IsNullOrWhiteSpace(request.Login) ||
-                string.IsNullOrWhiteSpace(request.Password))
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Invalid login data.");
+                return BadRequest(ModelState);
             }
 
             UserBL user = UserBL.Login(request.Login, request.Password);
@@ -176,28 +169,25 @@ namespace TijarahJoDBAPI.Controllers
                 return Unauthorized("Invalid username or password.");
             }
 
-			/// Optional: block deleted users (if your SP already checks IsDeleted = 0, this is extra safety)
-			/// if (user.IsDeleted)
-			///	{
-			///    return Unauthorized("User is deleted.");
-			/// }
+            if (user.UserID == null)
+            {
+                return Unauthorized("User not found.");
+            }
 
+            if (user.IsDeleted)
+            {
+                return Unauthorized("User is deleted.");
+            }
 
-			if (user.UserID == null)
-			{
-				return Unauthorized("User not found.");
-			}
+            string token = tokenService.CreateAuthToken(user.UserID);
 
-			if (user.IsDeleted)
-			{
-				return Unauthorized("User is deleted.");
-			}
+            var response = new LoginResponse
+            {
+                User = user.UserModel.ToResponse(),
+                Token = token
+            };
 
-			string Token = tokenService.CreateAuthToken(user.UserID);
-            /// Axios in Frontend ... You will receive object and AXIOS reponse.data.User and response.data.Token
-			/// reponse.data.User.UserName , Password, 
-			/// Axios always with .data
-            return Ok(new { User = user.UserModel, Token });
+            return Ok(response);
         }
 		/*
 		*/
@@ -220,11 +210,11 @@ namespace TijarahJoDBAPI.Controllers
 
 			if (UserBL.DeleteUser(id))
 			{
-				return Ok($"UserBL with ID {id} has been deleted.");
+				return Ok($"User with ID {id} has been deleted.");
 			}
 			else
 			{
-				return NotFound($"UserBL with ID {id} not found. No rows deleted!");
+				return NotFound($"User with ID {id} not found. No rows deleted!");
 			}
 		}
 
