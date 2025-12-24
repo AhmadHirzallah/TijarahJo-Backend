@@ -3,7 +3,16 @@ using System;
 namespace Models;
     public class UserModel
     {
-        public UserModel(int? userid, string username, string hashedpassword, string email, string firstname, string lastname, DateTime joindate, int status, int roleid, bool isdeleted)
+        public UserModel(int? userid,
+                         string username,
+                         string hashedpassword,
+                         string email,
+                         string firstname,
+                         string lastname,
+                         DateTime joindate,
+                         int status,
+                         int roleid,
+                         bool isdeleted)
         {
             this.UserID = userid;
             this.Username = username;

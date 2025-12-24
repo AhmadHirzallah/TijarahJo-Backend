@@ -8,7 +8,6 @@ namespace TijarahJoDBAPI.Controllers
 {
 	[ApiController]
 	[Route("api/TbUsers")]
-    // To-do
 	public class UsersController(/*JwtOptions jwtOptions,*/ TokenService tokenService) : ControllerBase
 	//public class UsersController() : ControllerBase
 	{

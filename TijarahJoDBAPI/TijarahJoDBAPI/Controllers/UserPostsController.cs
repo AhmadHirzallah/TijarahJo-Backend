@@ -88,7 +88,6 @@ namespace TijarahJoDBAPI.Controllers
 
 
 
-
 		[HttpGet("{id}", Name = "GetPostById")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -114,8 +113,6 @@ namespace TijarahJoDBAPI.Controllers
 
 
 
-
-        // To-do
 		//[Authorize]
 
 		[HttpPost(Name = "AddPost")]
@@ -230,9 +227,6 @@ namespace TijarahJoDBAPI.Controllers
 
 			return Ok(exists);
 		}
-
-
-		
 
 
 	}
