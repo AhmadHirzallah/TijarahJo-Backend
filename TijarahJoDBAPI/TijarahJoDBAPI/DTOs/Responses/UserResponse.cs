@@ -11,6 +11,11 @@ public class UserResponse
     public int Status { get; set; }
     public int RoleID { get; set; }
     public bool IsDeleted { get; set; }
+    
+    /// <summary>
+    /// Primary phone number from TbUserPhoneNumbers
+    /// </summary>
+    public string? PrimaryPhone { get; set; }
 
     // Computed property for convenience
     public string FullName => string.IsNullOrEmpty(LastName) 

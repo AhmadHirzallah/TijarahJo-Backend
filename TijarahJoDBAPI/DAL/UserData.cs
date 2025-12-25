@@ -27,16 +27,17 @@ namespace TijarahJoDB.DAL
 							{
 								return new UserModel
 								(
-							reader.GetInt32(reader.GetOrdinal("UserID")),
-							reader.GetString(reader.GetOrdinal("Username")),
-							reader.GetString(reader.GetOrdinal("HashedPassword")),
-							reader.GetString(reader.GetOrdinal("Email")),
-							reader.GetString(reader.GetOrdinal("FirstName")),
-							reader.IsDBNull(reader.GetOrdinal("LastName")) ? null : (string)reader.GetString(reader.GetOrdinal("LastName")),
-							reader.GetDateTime(reader.GetOrdinal("JoinDate")),
-							reader.GetInt32(reader.GetOrdinal("Status")),
-							reader.GetInt32(reader.GetOrdinal("RoleID")),
-							reader.GetBoolean(reader.GetOrdinal("IsDeleted"))
+									reader.GetInt32(reader.GetOrdinal("UserID")),
+									reader.GetString(reader.GetOrdinal("Username")),
+									reader.GetString(reader.GetOrdinal("HashedPassword")),
+									reader.GetString(reader.GetOrdinal("Email")),
+									reader.GetString(reader.GetOrdinal("FirstName")),
+									reader.IsDBNull(reader.GetOrdinal("LastName")) ? null : reader.GetString(reader.GetOrdinal("LastName")),
+									reader.GetDateTime(reader.GetOrdinal("JoinDate")),
+									reader.GetInt32(reader.GetOrdinal("Status")),
+									reader.GetInt32(reader.GetOrdinal("RoleID")),
+									reader.GetBoolean(reader.GetOrdinal("IsDeleted")),
+									reader.IsDBNull(reader.GetOrdinal("PrimaryPhone")) ? null : reader.GetString(reader.GetOrdinal("PrimaryPhone"))
 								);
 							}
 							else
@@ -49,27 +50,117 @@ namespace TijarahJoDB.DAL
 			}
 			catch (Exception ex)
 			{
-				// Log exception
+				System.Diagnostics.Debug.WriteLine($"GetUserByID Error: {ex.Message}");
+				return null;
+			}
+		}
+
+        /// <summary>
+        /// Gets user by username or email for login (without password verification)
+        /// Password verification should be done by the application layer
+        /// </summary>
+        /// <param name="login">Username or email</param>
+        /// <returns>UserModel if found, null otherwise</returns>
+        public static UserModel? GetUserByLogin(string login)
+		{
+			try
+			{
+				using var connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+				using var command = new SqlCommand("SP_GetUserByLogin", connection);
+
+				command.CommandType = CommandType.StoredProcedure;
+				command.Parameters.AddWithValue("@Login", login);
+
+				connection.Open();
+
+				using var reader = command.ExecuteReader();
+				if (reader.Read())
+				{
+					return new UserModel(
+						reader.GetInt32(reader.GetOrdinal("UserID")),
+						reader.GetString(reader.GetOrdinal("Username")),
+						reader.GetString(reader.GetOrdinal("HashedPassword")),
+						reader.GetString(reader.GetOrdinal("Email")),
+						reader.GetString(reader.GetOrdinal("FirstName")),
+						reader.IsDBNull(reader.GetOrdinal("LastName")) ? null : reader.GetString(reader.GetOrdinal("LastName")),
+						reader.GetDateTime(reader.GetOrdinal("JoinDate")),
+						reader.GetInt32(reader.GetOrdinal("Status")),
+						reader.GetInt32(reader.GetOrdinal("RoleID")),
+						reader.GetBoolean(reader.GetOrdinal("IsDeleted")),
+						reader.IsDBNull(reader.GetOrdinal("PrimaryPhone")) ? null : reader.GetString(reader.GetOrdinal("PrimaryPhone"))
+					);
+				}
+
+				return null;
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine($"GetUserByLogin Error: {ex.Message}");
 				return null;
 			}
 		}
 
 		public static int AddUser(UserModel UserModel)
 		{
-			using (var connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-			using (var command = new SqlCommand("SP_AddUser", connection))
+			try
 			{
+				using (var connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+				using (var command = new SqlCommand("SP_CreateUser", connection))
+				{
+					command.CommandType = CommandType.StoredProcedure;
+
+					command.Parameters.Add("@Username", SqlDbType.NVarChar, 200).Value = UserModel.Username;
+					command.Parameters.Add("@HashedPassword", SqlDbType.NVarChar, 510).Value = UserModel.HashedPassword;
+					command.Parameters.Add("@Email", SqlDbType.NVarChar, 510).Value = UserModel.Email;
+					command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 200).Value = UserModel.FirstName;
+					command.Parameters.Add("@LastName", SqlDbType.NVarChar, 200).Value = (object?)UserModel.LastName ?? DBNull.Value;
+					command.Parameters.Add("@JoinDate", SqlDbType.DateTime2).Value = UserModel.JoinDate;
+					command.Parameters.Add("@Status", SqlDbType.Int).Value = UserModel.Status;
+					command.Parameters.Add("@RoleID", SqlDbType.Int).Value = UserModel.RoleID;
+					command.Parameters.Add("@IsDeleted", SqlDbType.Bit).Value = UserModel.IsDeleted;
+					
+					var outputIdParam = new SqlParameter("@NewUserID", SqlDbType.Int)
+					{
+						Direction = ParameterDirection.Output
+					};
+					command.Parameters.Add(outputIdParam);
+
+					connection.Open();
+					command.ExecuteNonQuery();
+
+					return (int)outputIdParam.Value;
+				}
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine($"AddUser Error: {ex.Message}");
+				return -1;
+			}
+		}
+
+		/// <summary>
+		/// Creates a user with an optional primary phone number in one transaction
+		/// </summary>
+		public static int AddUserWithPhone(UserModel userModel, string? phoneNumber)
+		{
+			try
+			{
+				using var connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+				using var command = new SqlCommand("SP_CreateUserWithPhone", connection);
+				
 				command.CommandType = CommandType.StoredProcedure;
 
-				command.Parameters.AddWithValue("@Username", UserModel.Username);
-				command.Parameters.AddWithValue("@HashedPassword", UserModel.HashedPassword);
-				command.Parameters.AddWithValue("@Email", UserModel.Email);
-				command.Parameters.AddWithValue("@FirstName", UserModel.FirstName);
-				command.Parameters.AddWithValue("@LastName", (object)UserModel.LastName ?? DBNull.Value);
-				command.Parameters.AddWithValue("@JoinDate", UserModel.JoinDate);
-				command.Parameters.AddWithValue("@Status", UserModel.Status);
-				command.Parameters.AddWithValue("@RoleID", UserModel.RoleID);
-				command.Parameters.AddWithValue("@IsDeleted", UserModel.IsDeleted);
+				command.Parameters.Add("@Username", SqlDbType.NVarChar, 200).Value = userModel.Username;
+				command.Parameters.Add("@HashedPassword", SqlDbType.NVarChar, 510).Value = userModel.HashedPassword;
+				command.Parameters.Add("@Email", SqlDbType.NVarChar, 510).Value = userModel.Email;
+				command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 200).Value = userModel.FirstName;
+				command.Parameters.Add("@LastName", SqlDbType.NVarChar, 200).Value = (object?)userModel.LastName ?? DBNull.Value;
+				command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar, 20).Value = (object?)phoneNumber ?? DBNull.Value;
+				command.Parameters.Add("@JoinDate", SqlDbType.DateTime2).Value = userModel.JoinDate;
+				command.Parameters.Add("@Status", SqlDbType.Int).Value = userModel.Status;
+				command.Parameters.Add("@RoleID", SqlDbType.Int).Value = userModel.RoleID;
+				command.Parameters.Add("@IsDeleted", SqlDbType.Bit).Value = userModel.IsDeleted;
+				
 				var outputIdParam = new SqlParameter("@NewUserID", SqlDbType.Int)
 				{
 					Direction = ParameterDirection.Output
@@ -80,6 +171,11 @@ namespace TijarahJoDB.DAL
 				command.ExecuteNonQuery();
 
 				return (int)outputIdParam.Value;
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine($"AddUserWithPhone Error: {ex.Message}");
+				return -1;
 			}
 		}
 
@@ -100,7 +196,7 @@ namespace TijarahJoDB.DAL
 						command.Parameters.AddWithValue("@HashedPassword", dto.HashedPassword);
 						command.Parameters.AddWithValue("@Email", dto.Email);
 						command.Parameters.AddWithValue("@FirstName", dto.FirstName);
-						command.Parameters.AddWithValue("@LastName", (object)dto.LastName ?? DBNull.Value);
+						command.Parameters.AddWithValue("@LastName", (object?)dto.LastName ?? DBNull.Value);
 						command.Parameters.AddWithValue("@JoinDate", dto.JoinDate);
 						command.Parameters.AddWithValue("@Status", dto.Status);
 						command.Parameters.AddWithValue("@RoleID", dto.RoleID);
@@ -113,7 +209,7 @@ namespace TijarahJoDB.DAL
 			}
 			catch (Exception ex)
 			{
-				// Log exception
+				System.Diagnostics.Debug.WriteLine($"UpdateUser Error: {ex.Message}");
 				return false;
 			}
 
@@ -140,7 +236,7 @@ namespace TijarahJoDB.DAL
 			}
 			catch (Exception ex)
 			{
-				// Log exception
+				System.Diagnostics.Debug.WriteLine($"DeleteUser Error: {ex.Message}");
 			}
 
 			return (rowsAffected > 0);
@@ -163,13 +259,13 @@ namespace TijarahJoDB.DAL
 
 						object result = command.ExecuteScalar();
 						if (result != null && result != DBNull.Value)
-							isFound = (bool)result;
+						 isFound = (bool)result;
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				// Log exception
+				System.Diagnostics.Debug.WriteLine($"DoesUserExist Error: {ex.Message}");
 				isFound = false;
 			}
 
@@ -200,7 +296,7 @@ namespace TijarahJoDB.DAL
 			}
 			catch (Exception ex)
 			{
-				// Log exception
+				System.Diagnostics.Debug.WriteLine($"GetAllTbUsers Error: {ex.Message}");
 			}
 
 			return dt;
@@ -231,8 +327,7 @@ namespace TijarahJoDB.DAL
                                 reader.GetString(reader.GetOrdinal("HashedPassword")),
                                 reader.GetString(reader.GetOrdinal("Email")),
                                 reader.GetString(reader.GetOrdinal("FirstName")),
-                                reader.IsDBNull(reader.GetOrdinal("LastName")) ? null :
-																				reader.GetString(reader.GetOrdinal("LastName")),
+                                reader.IsDBNull(reader.GetOrdinal("LastName")) ? null : reader.GetString(reader.GetOrdinal("LastName")),
                                 reader.GetDateTime(reader.GetOrdinal("JoinDate")),
                                 reader.GetInt32(reader.GetOrdinal("Status")),
                                 reader.GetInt32(reader.GetOrdinal("RoleID")),
@@ -242,16 +337,12 @@ namespace TijarahJoDB.DAL
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // log exception
+                System.Diagnostics.Debug.WriteLine($"GetUserByLoginAndPassword Error: {ex.Message}");
             }
 
             return null;
         }
-
-
-
-
     }
 }

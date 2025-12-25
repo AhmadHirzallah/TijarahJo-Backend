@@ -3,12 +3,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using TijarahJoDBAPI;
+using TijarahJoDBAPI.Services;
+using TijarahJoDBAPI.Services.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -16,7 +17,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "TijarahJoDBAPI",
         Version = "v1",
-        Description = "API documentation for TijarahJoDBAPI with JWT Authentication"
+        Description = "TijarahJo Marketplace API with JWT Authentication and Role-Based Authorization"
     });
 
     // Enable JWT authentication in Swagger
@@ -27,7 +28,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' followed by your JWT token. Example: Bearer eyJhbGciOiJIUzI1NiIs..."
+        Description = "Enter your JWT token. Example: eyJhbGciOiJIUzI1NiIs..."
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -46,65 +47,121 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// JWT Configuration
+var jwtOptions = builder.Configuration.GetSection("JWT").Get<JwtOptions>()
+    ?? throw new InvalidOperationException("JWT configuration is missing");
 
-// 
-///
-/// @brief from appsettings.Development.json 
-/// Get - Deserialize section "JWT" to JwtOptions class
-/// Dotnet by default by default from appsettings.json and appsettings.{Environment}.json
-var jwtOption = builder.Configuration.GetSection("JWT").Get<JwtOptions>();
+builder.Services.AddSingleton(jwtOptions);
+builder.Services.AddScoped<TokenService>();
 
+// Register Security Services (Password Hashing)
+builder.Services.AddScoped<IPasswordHashingService, PasswordHashingService>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
 
-builder.Services.AddSingleton(jwtOption); // Only one  for all the program lifetime
+// Register HttpContextAccessor for ImageUploadService
+builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<TokenService>(); // Only one  for all the program lifetime
+// Register ImageUploadService for handling file uploads
+builder.Services.AddScoped<ImageUploadService>();
 
-builder.Services.AddAuthentication(options => {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-       .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-       {
-
-           /// <summary>
-           /// Instructs the JWT Bearer authentication handler to store the raw bearer token (from
-           /// <c>Authorization: Bearer &lt;token&gt;</c>) into the successful authentication result’s
-           /// <see cref="Microsoft.AspNetCore.Authentication.AuthenticationProperties"/> (typically as <c>access_token</c>).
-           /// This does not change token validation or claims creation; it only makes the original token retrievable later
-           /// in the same request pipeline (e.g., <c>HttpContext.GetTokenAsync("access_token")</c>).
-           /// </summary>
-           options.SaveToken = true; // Save token in AuthenticationProperties after a successful authorization
-           
-           options.TokenValidationParameters = new TokenValidationParameters()
-           {
-               ValidateIssuer = true,
-               ValidIssuer = jwtOption!.Issuer,
-
-               ValidateAudience = true,
-               ValidAudience = jwtOption!.Audience,
-
-               ValidateIssuerSigningKey = true,
-               IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOption.SigningKey))
-           };
-       });
-
-
-/// Configure CORS to allow specific origins
-builder.Services.AddCors(options =>
+// Configure JWT Authentication
+builder.Services.AddAuthentication(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy =>
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    options.SaveToken = true;
+    
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = jwtOptions.Issuer,
+
+        ValidateAudience = true,
+        ValidAudience = jwtOptions.Audience,
+
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
+
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero // No tolerance for token expiration
+    };
+
+    // Custom response for authentication failures
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
         {
-            policy.WithOrigins("http://localhost:3456") // PUT THE FRONTEND URL HERE e.g., "http://localhost:3000"
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials();
-        });
+            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+            {
+                context.Response.Headers.Append("Token-Expired", "true");
+            }
+            return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            // Skip default response
+            context.HandleResponse();
+            
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+            
+            var result = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                title = "Unauthorized",
+                status = 401,
+                detail = "You are not authorized to access this resource. Please provide a valid JWT token."
+            });
+            
+            return context.Response.WriteAsync(result);
+        },
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/json";
+            
+            var result = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                title = "Forbidden",
+                status = 403,
+                detail = "You do not have permission to access this resource."
+            });
+            
+            return context.Response.WriteAsync(result);
+        }
+    };
 });
 
+// Add Authorization policies
+builder.Services.AddAuthorization(options =>
+{
+    // Default policy requires authenticated user
+    options.FallbackPolicy = null; // Allow anonymous by default
+    
+    // Admin-only policy
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+    
+    // Admin or Moderator policy
+    options.AddPolicy("AdminOrModerator", policy =>
+        policy.RequireRole("Admin", "Moderator"));
+});
+
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .WithExposedHeaders("Token-Expired"); // Expose custom header to frontend
+    });
+});
 
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -114,11 +171,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Enable serving static files from wwwroot (for uploaded images)
+app.UseStaticFiles();
+
+// CORS must be before Authentication
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Done
-app.UseCors("AllowAll");
 app.MapControllers();
 
 app.Run();

@@ -190,5 +190,34 @@ namespace TijarahJoDB.DAL
 
 			return dt;
 		}
+
+		/// <summary>
+		/// Gets all images for a specific post
+		/// </summary>
+		public static DataTable GetImagesByPostId(int postId)
+		{
+			DataTable dt = new DataTable();
+
+			try
+			{
+				using var connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+				using var command = new SqlCommand("SP_GetPostImagesByPostID", connection);
+
+				command.CommandType = CommandType.StoredProcedure;
+				command.Parameters.Add("@PostID", SqlDbType.Int).Value = postId;
+
+				connection.Open();
+
+				using var reader = command.ExecuteReader();
+				if (reader.HasRows)
+					dt.Load(reader);
+			}
+			catch (Exception ex)
+			{
+				// Log exception
+			}
+
+			return dt;
+		}
 	}
 }

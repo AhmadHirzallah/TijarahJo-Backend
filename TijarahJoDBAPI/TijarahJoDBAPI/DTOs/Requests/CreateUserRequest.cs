@@ -2,6 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TijarahJoDBAPI.DTOs.Requests;
 
+/// <summary>
+/// Request model for Admin to create users with specific roles.
+/// Use RegisterUserRequest for public registration.
+/// </summary>
 public class CreateUserRequest
 {
     [Required(ErrorMessage = "Username is required.")]
@@ -23,9 +27,20 @@ public class CreateUserRequest
     [StringLength(100, ErrorMessage = "Last name cannot exceed 100 characters.")]
     public string? LastName { get; set; }
 
+    /// <summary>
+    /// Optional primary phone number (stored in TbUserPhoneNumbers)
+    /// </summary>
+    [Phone(ErrorMessage = "Invalid phone number format.")]
+    [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters.")]
+    public string? PhoneNumber { get; set; }
+
     [Range(0, int.MaxValue, ErrorMessage = "Status must be a non-negative value.")]
     public int Status { get; set; } = 0;
 
+    /// <summary>
+    /// Role to assign: 1 = Admin, 2 = User, 3 = Moderator
+    /// </summary>
+    [Required(ErrorMessage = "RoleID is required for admin user creation.")]
     [Range(1, int.MaxValue, ErrorMessage = "RoleID must be a positive value.")]
-    public int RoleID { get; set; } = 1;
+    public int RoleID { get; set; }
 }

@@ -3,171 +3,116 @@
   "WorkspaceRootPath": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\updateuserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\updateuserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\updaterolerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\updaterolerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\updatepostrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\updatepostrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\updatepostimagerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\updatepostimagerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\updatecategoryrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\updatecategoryrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\loginrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\loginrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\getpaginatedrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\getpaginatedrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\createuserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\createuserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\createrolerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\createrolerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\createpostrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\createpostrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\createpostimagerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\createpostimagerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\createcategoryrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\createcategoryrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\controllers\\userpostscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\controllers\\userpostscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\mappers\\postmapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\mappers\\postmapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\mappers\\usermapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\mappers\\usermapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\controllers\\itemcategoriescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\controllers\\itemcategoriescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\controllers\\postimagescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\controllers\\postimagescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\controllers\\rolescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\controllers\\rolescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\dal\\categorydata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|solutionrelative:dal\\categorydata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\models\\usermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|solutionrelative:models\\usermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\models\\postmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|solutionrelative:models\\postmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\dal\\userdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|solutionrelative:dal\\userdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2D3C4684-6E74-4442-AD91-A494A4A85E32}|BLL\\BLL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\bll\\userbl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2D3C4684-6E74-4442-AD91-A494A4A85E32}|BLL\\BLL.csproj|solutionrelative:bll\\userbl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\tijarahjodbapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\tijarahjodbapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\jwtoptions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\jwtoptions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\controllers\\postscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\controllers\\postscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\dal\\postdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|solutionrelative:dal\\postdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\admin_panel_guide.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\admin_panel_guide.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\responses\\apiresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\responses\\apiresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\database\\phonenumbers_setup.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\database\\phonenumbers_setup.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\frontendguidereadme.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\frontendguidereadme.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\mappers\\postdetailsmapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\mappers\\postdetailsmapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\wwwroot\\uploads\\posts\\1\\1_5829beafbc4f4ff2a3f0dc0614edf641_20251224225042.png||{58961B49-13E0-48C0-9258-13CBC4D40279}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\wwwroot\\uploads\\posts\\1\\1_5829beafbc4f4ff2a3f0dc0614edf641_20251224225042.png||{58961B49-13E0-48C0-9258-13CBC4D40279}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\services\\security\\securityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\services\\security\\securityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\controllers\\categoriescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\controllers\\categoriescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\registeruserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\registeruserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\createuserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\createuserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\dal\\postdetailsdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|solutionrelative:dal\\postdetailsdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\models\\usermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|solutionrelative:models\\usermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D3C4684-6E74-4442-AD91-A494A4A85E32}|BLL\\BLL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\bll\\userbl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D3C4684-6E74-4442-AD91-A494A4A85E32}|BLL\\BLL.csproj|solutionrelative:bll\\userbl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\updateuserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\updateuserrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\responses\\userresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\responses\\userresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\responses\\loginresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\responses\\loginresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\mappers\\usermapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\mappers\\usermapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\responses\\postresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\responses\\postresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\models\\userphonenumbermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7EB74F02-7A92-4152-B8F0-8D97F4BF91E0}|Models\\Models.csproj|solutionrelative:models\\userphonenumbermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\responses\\categoryresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\responses\\categoryresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\dal\\userphonenumberdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{399A3EC7-FF6A-4626-99E7-D5EEB17F4DD1}|DAL\\DAL.csproj|solutionrelative:dal\\userphonenumberdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\responses\\roleresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\responses\\roleresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2D3C4684-6E74-4442-AD91-A494A4A85E32}|BLL\\BLL.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\bll\\userphonenumberbl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D3C4684-6E74-4442-AD91-A494A4A85E32}|BLL\\BLL.csproj|solutionrelative:bll\\userphonenumberbl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\responses\\postimageresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\responses\\postimageresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\requests\\userphonerequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\requests\\userphonerequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\responses\\paginatedresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\responses\\paginatedresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\responses\\userphoneresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\responses\\userphoneresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\mappers\\categorymapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\mappers\\categorymapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\mappers\\rolemapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\mappers\\rolemapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\mappers\\postimagemapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\mappers\\postimagemapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Ahmad\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\323960815\\LoginRequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|e:\\dash board\\projects\\000-tijarahjo\\tijarahjo-backend\\tijarahjodbapi\\tijarahjodbapi\\dtos\\mappers\\userphonemapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E18CB6AB-17D0-4217-9204-CA864AAA6B51}|TijarahJoDBAPI\\TijarahJoDBAPI.csproj|solutionrelative:tijarahjodbapi\\dtos\\mappers\\userphonemapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -177,543 +122,345 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 24,
+          "SelectedChildIndex": 26,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "UserPostsController.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\UserPostsController.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Controllers\\UserPostsController.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\UserPostsController.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\Controllers\\UserPostsController.cs",
-              "ViewState": "AgIAADIAAAAAAAAAAMBAwGQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T06:16:24.583Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "LoginRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\LoginRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\LoginRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\LoginRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\LoginRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T06:41:02.575Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 41,
-              "Title": "LoginRequest.cs",
-              "DocumentMoniker": "C:\\Users\\Ahmad\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\323960815\\LoginRequest.cs",
-              "ToolTip": "C:\\Users\\Ahmad\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\323960815\\LoginRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:38:44.473Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 40,
-              "Title": "PostImageMapper.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\PostImageMapper.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Mappers\\PostImageMapper.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\PostImageMapper.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Mappers\\PostImageMapper.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:36:32.134Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 39,
-              "Title": "RoleMapper.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\RoleMapper.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Mappers\\RoleMapper.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\RoleMapper.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Mappers\\RoleMapper.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:36:26.76Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 38,
-              "Title": "CategoryMapper.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\CategoryMapper.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Mappers\\CategoryMapper.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\CategoryMapper.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Mappers\\CategoryMapper.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:36:21.775Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "PostMapper.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\PostMapper.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Mappers\\PostMapper.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\PostMapper.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Mappers\\PostMapper.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:36:16.975Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "UserMapper.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\UserMapper.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Mappers\\UserMapper.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\UserMapper.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Mappers\\UserMapper.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:36:11.784Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 37,
-              "Title": "PaginatedResponse.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\PaginatedResponse.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\PaginatedResponse.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\PaginatedResponse.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\PaginatedResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:36:05.447Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 36,
-              "Title": "PostImageResponse.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\PostImageResponse.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\PostImageResponse.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\PostImageResponse.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\PostImageResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:58.395Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 35,
-              "Title": "RoleResponse.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\RoleResponse.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\RoleResponse.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\RoleResponse.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\RoleResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:53.814Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 34,
-              "Title": "CategoryResponse.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\CategoryResponse.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\CategoryResponse.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\CategoryResponse.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\CategoryResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:49.004Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 33,
-              "Title": "PostResponse.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\PostResponse.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\PostResponse.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\PostResponse.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\PostResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:44.089Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 32,
-              "Title": "LoginResponse.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\LoginResponse.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\LoginResponse.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\LoginResponse.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\LoginResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:38.604Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 31,
-              "Title": "UserResponse.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\UserResponse.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\UserResponse.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\UserResponse.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\UserResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:33.017Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 30,
-              "Title": "ApiResponse.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\ApiResponse.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\ApiResponse.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\ApiResponse.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\ApiResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAD4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:24.749Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "UpdatePostImageRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdatePostImageRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\UpdatePostImageRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdatePostImageRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\UpdatePostImageRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:15.705Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "CreatePostImageRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreatePostImageRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\CreatePostImageRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreatePostImageRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\CreatePostImageRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:09.241Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "UpdateRoleRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdateRoleRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\UpdateRoleRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdateRoleRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\UpdateRoleRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:35:02.987Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "CreateRoleRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreateRoleRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\CreateRoleRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreateRoleRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\CreateRoleRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:34:56.773Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "UpdateCategoryRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdateCategoryRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\UpdateCategoryRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdateCategoryRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\UpdateCategoryRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:34:50.841Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "CreateCategoryRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreateCategoryRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\CreateCategoryRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreateCategoryRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\CreateCategoryRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:34:45.883Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "UpdatePostRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdatePostRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\UpdatePostRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdatePostRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\UpdatePostRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:34:41.038Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "CreatePostRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreatePostRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\CreatePostRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreatePostRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\CreatePostRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:34:34.841Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "UpdateUserRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdateUserRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\UpdateUserRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdateUserRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\UpdateUserRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:34:28.528Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "CreateUserRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreateUserRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\CreateUserRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreateUserRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\CreateUserRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:34:21.796Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "GetPaginatedRequest.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\GetPaginatedRequest.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\GetPaginatedRequest.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\GetPaginatedRequest.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\GetPaginatedRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T17:30:14.203Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "RolesController.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\RolesController.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Controllers\\RolesController.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\RolesController.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\Controllers\\RolesController.cs",
-              "ViewState": "AgIAAJ0AAAAAAAAAAEBawAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T16:36:55.8Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "CategoryData.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\CategoryData.cs",
-              "RelativeDocumentMoniker": "DAL\\CategoryData.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\CategoryData.cs",
-              "RelativeToolTip": "DAL\\CategoryData.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T16:16:21.59Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "ItemCategoriesController.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\ItemCategoriesController.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Controllers\\ItemCategoriesController.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\ItemCategoriesController.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\Controllers\\ItemCategoriesController.cs",
-              "ViewState": "AgIAAJAAAAAAAAAAAAApwHAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T16:13:17.896Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "UserModel.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\Models\\UserModel.cs",
-              "RelativeDocumentMoniker": "Models\\UserModel.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\Models\\UserModel.cs",
-              "RelativeToolTip": "Models\\UserModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAtAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T16:11:49.084Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 28,
               "Title": "PostData.cs",
               "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\PostData.cs",
               "RelativeDocumentMoniker": "DAL\\PostData.cs",
               "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\PostData.cs",
               "RelativeToolTip": "DAL\\PostData.cs",
-              "ViewState": "AgIAACIAAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADcAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-19T07:41:03.064Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "UsersController.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\UsersController.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Controllers\\UsersController.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\UsersController.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\Controllers\\UsersController.cs",
-              "ViewState": "AgIAAOgAAAAAAAAAAIBfwBsAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T06:40:02.766Z",
+              "WhenOpened": "2025-12-25T01:26:00.58Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PhoneNumbers_Setup.sql",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Database\\PhoneNumbers_Setup.sql",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Database\\PhoneNumbers_Setup.sql",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Database\\PhoneNumbers_Setup.sql",
+              "RelativeToolTip": "TijarahJoDBAPI\\Database\\PhoneNumbers_Setup.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-12-25T01:12:51.912Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ADMIN_PANEL_GUIDE.md",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\ADMIN_PANEL_GUIDE.md",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\ADMIN_PANEL_GUIDE.md",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\ADMIN_PANEL_GUIDE.md",
+              "RelativeToolTip": "TijarahJoDBAPI\\ADMIN_PANEL_GUIDE.md",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAQwBwAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-12-25T01:11:58.67Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "UserPhoneMapper.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\UserPhoneMapper.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Mappers\\UserPhoneMapper.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\UserPhoneMapper.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Mappers\\UserPhoneMapper.cs",
+              "ViewState": "AgIAACQAAAAAAAAAAIBfwCkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:59:54.497Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "UserPhoneResponse.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\UserPhoneResponse.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\UserPhoneResponse.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\UserPhoneResponse.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\UserPhoneResponse.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAEBnwBkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:59:41.625Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "UserPhoneRequests.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UserPhoneRequests.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\UserPhoneRequests.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UserPhoneRequests.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\UserPhoneRequests.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAMBYwCUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:59:28.921Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 24,
+              "Title": "UserPhoneNumberBL.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\BLL\\UserPhoneNumberBL.cs",
+              "RelativeDocumentMoniker": "BLL\\UserPhoneNumberBL.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\BLL\\UserPhoneNumberBL.cs",
+              "RelativeToolTip": "BLL\\UserPhoneNumberBL.cs",
+              "ViewState": "AgIAAHgAAAAAAAAAAEBkwH4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:57:43.521Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "UserPhoneNumberData.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\UserPhoneNumberData.cs",
+              "RelativeDocumentMoniker": "DAL\\UserPhoneNumberData.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\UserPhoneNumberData.cs",
+              "RelativeToolTip": "DAL\\UserPhoneNumberData.cs",
+              "ViewState": "AgIAALwAAAAAAAAAAGBiwMIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:57:18.263Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "UserPhoneNumberModel.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\Models\\UserPhoneNumberModel.cs",
+              "RelativeDocumentMoniker": "Models\\UserPhoneNumberModel.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\Models\\UserPhoneNumberModel.cs",
+              "RelativeToolTip": "Models\\UserPhoneNumberModel.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAYwCAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:56:45.797Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "UserMapper.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\UserMapper.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Mappers\\UserMapper.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\UserMapper.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Mappers\\UserMapper.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAABFwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:52:10.81Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "UserResponse.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\UserResponse.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Responses\\UserResponse.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Responses\\UserResponse.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Responses\\UserResponse.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAABVwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:51:56.543Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "UpdateUserRequest.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdateUserRequest.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\UpdateUserRequest.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\UpdateUserRequest.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\UpdateUserRequest.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:51:46.684Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
               "Title": "UserBL.cs",
               "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\BLL\\UserBL.cs",
               "RelativeDocumentMoniker": "BLL\\UserBL.cs",
               "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\BLL\\UserBL.cs",
               "RelativeToolTip": "BLL\\UserBL.cs",
-              "ViewState": "AgIAACAAAAAAAAAAAAAAADEAAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAJYAAAAAAAAAAIBPwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T06:38:17.174Z"
+              "WhenOpened": "2025-12-25T00:50:40.79Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 17,
+              "Title": "UserModel.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\Models\\UserModel.cs",
+              "RelativeDocumentMoniker": "Models\\UserModel.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\Models\\UserModel.cs",
+              "RelativeToolTip": "Models\\UserModel.cs",
+              "ViewState": "AgIAACwAAAAAAAAAAMBYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T00:48:23.286Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "UserData.cs",
               "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\UserData.cs",
               "RelativeDocumentMoniker": "DAL\\UserData.cs",
               "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\UserData.cs",
               "RelativeToolTip": "DAL\\UserData.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAOgAAABDAAAAAAAAAA==",
+              "ViewState": "AgIAALUAAAAAAAAAAAAcwM0AAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T06:36:32.921Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 21,
-              "Title": "PostModel.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\Models\\PostModel.cs",
-              "RelativeDocumentMoniker": "Models\\PostModel.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\Models\\PostModel.cs",
-              "RelativeToolTip": "Models\\PostModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T06:16:38.223Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "PostImagesController.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\PostImagesController.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Controllers\\PostImagesController.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\PostImagesController.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\Controllers\\PostImagesController.cs",
-              "ViewState": "AgIAAKAAAAAAAAAAAEBawAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T06:16:22.422Z",
+              "WhenOpened": "2025-12-25T00:30:46.893Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
-              "Title": "TokenService.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\TokenService.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\TokenService.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\TokenService.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\TokenService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAUwCgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T06:08:42.033Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 29,
-              "Title": "appsettings.Development.json",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\appsettings.Development.json",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\appsettings.Development.json",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\appsettings.Development.json",
-              "RelativeToolTip": "TijarahJoDBAPI\\appsettings.Development.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAjAAAAAAAAAA==",
+              "DocumentIndex": 8,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Properties\\launchSettings.json",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Properties\\launchSettings.json",
+              "RelativeToolTip": "TijarahJoDBAPI\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAIwBcAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-12-18T06:03:57.886Z"
+              "WhenOpened": "2025-12-24T23:56:19.937Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
-              "Title": "JwtOptions.cs",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\JwtOptions.cs",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\JwtOptions.cs",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\JwtOptions.cs",
-              "RelativeToolTip": "TijarahJoDBAPI\\JwtOptions.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAgAAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T05:59:47.254Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 25,
-              "Title": "TijarahJoDBAPI.csproj",
-              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\TijarahJoDBAPI.csproj",
-              "RelativeDocumentMoniker": "TijarahJoDBAPI\\TijarahJoDBAPI.csproj",
-              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\TijarahJoDBAPI.csproj",
-              "RelativeToolTip": "TijarahJoDBAPI\\TijarahJoDBAPI.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAABgAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-12-18T05:55:18.146Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 7,
               "Title": "Program.cs",
               "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Program.cs",
               "RelativeDocumentMoniker": "TijarahJoDBAPI\\Program.cs",
               "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Program.cs",
               "RelativeToolTip": "TijarahJoDBAPI\\Program.cs",
-              "ViewState": "AgIAAD0AAAAAAAAAAAAAAHEAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAJwAAAAAAAAAAAAcwJ0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T05:51:15.24Z"
+              "WhenOpened": "2025-12-24T23:55:50Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "FrontendGuideReadme.md",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\FrontendGuideReadme.md",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\FrontendGuideReadme.md",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\FrontendGuideReadme.md",
+              "RelativeToolTip": "TijarahJoDBAPI\\FrontendGuideReadme.md",
+              "ViewState": "AgIAAB0HAAAAAAAAAAAywDcHAABTAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-12-24T23:41:20.748Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "PostDetailsData.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\PostDetailsData.cs",
+              "RelativeDocumentMoniker": "DAL\\PostDetailsData.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\DAL\\PostDetailsData.cs",
+              "RelativeToolTip": "DAL\\PostDetailsData.cs",
+              "ViewState": "AgIAAFQAAAAAAAAAAABVwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T23:17:36.015Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "PostDetailsMapper.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\PostDetailsMapper.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Mappers\\PostDetailsMapper.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Mappers\\PostDetailsMapper.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Mappers\\PostDetailsMapper.cs",
+              "ViewState": "AgIAAEYAAAAAAAAAAAAQwFUAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T23:02:26.672Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "1_5829beafbc4f4ff2a3f0dc0614edf641_20251224225042.png",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\wwwroot\\uploads\\posts\\1\\1_5829beafbc4f4ff2a3f0dc0614edf641_20251224225042.png",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\wwwroot\\uploads\\posts\\1\\1_5829beafbc4f4ff2a3f0dc0614edf641_20251224225042.png",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\wwwroot\\uploads\\posts\\1\\1_5829beafbc4f4ff2a3f0dc0614edf641_20251224225042.png",
+              "RelativeToolTip": "TijarahJoDBAPI\\wwwroot\\uploads\\posts\\1\\1_5829beafbc4f4ff2a3f0dc0614edf641_20251224225042.png",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001533|",
+              "WhenOpened": "2025-12-24T22:50:55.335Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "CreateUserRequest.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreateUserRequest.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\CreateUserRequest.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\CreateUserRequest.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\CreateUserRequest.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAMBYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T22:34:37.145Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "RegisterUserRequest.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\RegisterUserRequest.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\DTOs\\Requests\\RegisterUserRequest.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\DTOs\\Requests\\RegisterUserRequest.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\DTOs\\Requests\\RegisterUserRequest.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAMBYwCQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T22:34:27.824Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "UsersController.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\UsersController.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Controllers\\UsersController.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\UsersController.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\Controllers\\UsersController.cs",
+              "ViewState": "AgIAAMQEAAAAAAAAAAASwN8EAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T22:18:26.017Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PostsController.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\PostsController.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Controllers\\PostsController.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\PostsController.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\Controllers\\PostsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoEAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T22:01:33.892Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "CategoriesController.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\CategoriesController.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Controllers\\CategoriesController.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\CategoriesController.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\Controllers\\CategoriesController.cs",
+              "ViewState": "AgIAABsBAAAAAAAAAIBPwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T22:00:32.605Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RolesController.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\RolesController.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Controllers\\RolesController.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Controllers\\RolesController.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\Controllers\\RolesController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T21:59:54.343Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "SecurityService.cs",
+              "DocumentMoniker": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Services\\Security\\SecurityService.cs",
+              "RelativeDocumentMoniker": "TijarahJoDBAPI\\Services\\Security\\SecurityService.cs",
+              "ToolTip": "E:\\Dash Board\\Projects\\000-TijarahJo\\TijarahJo-Backend\\TijarahJoDBAPI\\TijarahJoDBAPI\\Services\\Security\\SecurityService.cs",
+              "RelativeToolTip": "TijarahJoDBAPI\\Services\\Security\\SecurityService.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABIAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T21:41:14.09Z"
             }
           ]
         }

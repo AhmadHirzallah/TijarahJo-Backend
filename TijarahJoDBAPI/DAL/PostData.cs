@@ -83,8 +83,6 @@ namespace TijarahJoDB.DAL
 
 		public static bool UpdatePost(PostModel dto)
 		{
-			int rowsAffected = 0;
-
 			try
 			{
 				using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
@@ -97,24 +95,25 @@ namespace TijarahJoDB.DAL
 						command.Parameters.AddWithValue("@UserID", dto.UserID);
 						command.Parameters.AddWithValue("@CategoryID", dto.CategoryID);
 						command.Parameters.AddWithValue("@PostTitle", dto.PostTitle);
-						command.Parameters.AddWithValue("@PostDescription", (object)dto.PostDescription ?? DBNull.Value);
-						command.Parameters.AddWithValue("@Price", (object)dto.Price ?? DBNull.Value);
+						command.Parameters.AddWithValue("@PostDescription", (object?)dto.PostDescription ?? DBNull.Value);
+						command.Parameters.AddWithValue("@Price", (object?)dto.Price ?? DBNull.Value);
 						command.Parameters.AddWithValue("@Status", dto.Status);
 						command.Parameters.AddWithValue("@CreatedAt", dto.CreatedAt);
 						command.Parameters.AddWithValue("@IsDeleted", dto.IsDeleted);
 
 						connection.Open();
-						rowsAffected = (int)command.ExecuteScalar();
+						
+						// Use ExecuteNonQuery - returns number of rows affected
+						int rowsAffected = command.ExecuteNonQuery();
+						return rowsAffected > 0;
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				// Log exception
+				System.Diagnostics.Debug.WriteLine($"UpdatePost Error: {ex.Message}");
 				return false;
 			}
-
-			return (rowsAffected > 0);
 		}
 
 		public static bool DeletePost(int? PostID)
@@ -202,43 +201,60 @@ namespace TijarahJoDB.DAL
 
 			return dt;
 		}
+
+
 		/*
 		@IncludeDeleted
 		@RowsPerPage
 		@PageNumber
 		
 		*/
+		/// <summary>
+		/// Gets paginated posts with optional category filtering.
+		/// Returns enriched data from VW_PostsForListing view including user and category details.
+		/// </summary>
+		/// <param name="pageNumber">Page number (1-based)</param>
+		/// <param name="rowsPerPage">Number of rows per page (default: 10, max: 200)</param>
+		/// <param name="includeDeleted">Include soft-deleted posts</param>
+		/// <param name="categoryId">Optional category filter (null = all categories)</param>
+		/// <returns>DataTable with posts and TotalRows column</returns>
 		public static DataTable GetPaginated(
-			int PageNumber,
-			int RowsPerPage = 10,
-			bool IncludeDeleted = false)
+			int pageNumber,
+			int rowsPerPage = 10,
+			bool includeDeleted = false,
+			int? categoryId = null)
 		{
 			DataTable dt = new DataTable();
 
 			try
 			{
 				using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+				using (SqlCommand command = new SqlCommand("SP_GetTbPostsPaged", connection))
 				{
-					using (SqlCommand command = new SqlCommand("SP_GetTbPostsPaged", connection))
+					command.CommandType = CommandType.StoredProcedure;
+
+					// Use typed parameters for better performance and type safety
+					command.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+					command.Parameters.Add("@RowsPerPage", SqlDbType.Int).Value = rowsPerPage;
+					command.Parameters.Add("@IncludeDeleted", SqlDbType.Bit).Value = includeDeleted;
+
+					// Handle nullable CategoryID
+					var categoryParam = command.Parameters.Add("@CategoryID", SqlDbType.Int);
+					categoryParam.Value = categoryId.HasValue ? categoryId.Value : DBNull.Value;
+
+					connection.Open();
+
+					using (SqlDataReader reader = command.ExecuteReader())
 					{
-						command.CommandType = CommandType.StoredProcedure;
-						command.Parameters.AddWithValue("@PageNumber", PageNumber);
-						command.Parameters.AddWithValue("@RowsPerPage", RowsPerPage);
-						command.Parameters.AddWithValue("@IncludeDeleted", IncludeDeleted);
-
-						connection.Open();
-
-						using (SqlDataReader reader = command.ExecuteReader())
-						{
-							if (reader.HasRows)
-								dt.Load(reader);
-						}
+						if (reader.HasRows)
+							dt.Load(reader);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
 				// Log exception
+				// Consider using ILogger in production
 			}
 
 			return dt;

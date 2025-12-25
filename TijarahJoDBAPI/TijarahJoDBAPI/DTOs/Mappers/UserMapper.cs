@@ -17,7 +17,8 @@ public static class UserMapper
             JoinDate = model.JoinDate,
             Status = model.Status,
             RoleID = model.RoleID,
-            IsDeleted = model.IsDeleted
+            IsDeleted = model.IsDeleted,
+            PrimaryPhone = model.PrimaryPhone
         };
     }
 

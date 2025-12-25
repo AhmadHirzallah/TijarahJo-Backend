@@ -1,0 +1,1848 @@
+# TijarahJo API - Frontend Integration Guide
+
+> **Complete API documentation for frontend developers**
+>
+> API Version: 1.0 | .NET 8 | JWT Authentication
+
+---
+
+## Table of Contents
+
+1. [Overview](#1-overview)
+2. [Authentication](#2-authentication)
+3. [Error Handling](#3-error-handling)
+4. [Users API](#4-users-api)
+5. [User Images API](#5-user-images-api)
+6. [Posts API](#6-posts-api)
+7. [Post Images API](#7-post-images-api)
+8. [Post Reviews API](#8-post-reviews-api)
+9. [Categories API](#9-categories-api)
+10. [Roles API](#10-roles-api)
+11. [Admin API](#11-admin-api)
+12. [Data Models Reference](#12-data-models-reference)
+13. [Quick Reference Table](#13-quick-reference-table)
+
+---
+
+## 1. Overview
+
+### 1.1 Introduction
+
+**TijarahJo** is a Customer-to-Customer (C2C) marketplace platform API that enables users to:
+- Register and authenticate
+- Create and manage product listings (posts)
+- Upload images for products and profiles
+- Leave reviews on products
+- Browse categories
+
+### 1.2 Base URL
+
+```
+Development: https://localhost:{port}/api
+Production:  https://your-domain.com/api
+```
+
+### 1.3 Content Types
+
+| Request | Response |
+|---------|----------|
+| `application/json` | `application/json` |
+| `multipart/form-data` (file uploads) | `application/json` |
+
+### 1.4 CORS Configuration
+
+The API allows requests from:
+- `http://localhost:3000`
+- `http://localhost:3456`
+- `http://localhost:5173` (Vite)
+
+---
+
+## 2. Authentication
+
+### 2.1 Registration
+
+Creates a new user account with **User** role.
+
+```http
+POST /api/users/register
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "username": "johndoe",
+  "password": "SecurePass123",
+  "email": "john@example.com",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+```
+
+**Validation Rules:**
+
+| Field | Required | Rules |
+|-------|----------|-------|
+| `username` | ? | 3-50 characters |
+| `password` | ? | 6-100 characters |
+| `email` | ? | Valid email format |
+| `firstName` | ? | Max 100 characters |
+| `lastName` | ? | Max 100 characters |
+
+**Success Response (201 Created):**
+
+```json
+{
+  "userID": 5,
+  "username": "johndoe",
+  "email": "john@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "joinDate": "2024-01-15T10:30:00Z",
+  "status": 0,
+  "roleID": 2,
+  "isDeleted": false,
+  "fullName": "John Doe"
+}
+```
+
+---
+
+### 2.2 Login
+
+Authenticates a user and returns a JWT token.
+
+```http
+POST /api/users/login
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "login": "johndoe",
+  "password": "SecurePass123"
+}
+```
+
+> **Note:** `login` accepts either username OR email.
+
+**Success Response (200 OK):**
+
+```json
+{
+  "user": {
+    "userID": 5,
+    "username": "johndoe",
+    "email": "john@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "joinDate": "2024-01-15T10:30:00Z",
+    "status": 0,
+    "roleID": 2,
+    "isDeleted": false,
+    "fullName": "John Doe"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresAt": "2024-01-15T12:30:00Z",
+  "role": "User"
+}
+```
+
+**Error Response (401 Unauthorized):**
+
+```json
+{
+  "title": "Authentication Failed",
+  "detail": "Invalid username/email or password.",
+  "status": 401
+}
+```
+
+---
+
+### 2.3 Using JWT Tokens
+
+Include the token in the `Authorization` header for protected endpoints:
+
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**JavaScript Example:**
+
+```javascript
+const response = await fetch('/api/users/me', {
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  }
+});
+```
+
+---
+
+### 2.4 Token Expiration
+
+- Tokens have a **configurable lifetime** (typically 60 minutes)
+- When a token expires, the API returns a custom header: `Token-Expired: true`
+- Client should redirect to login or implement token refresh
+
+**Handling Expired Tokens:**
+
+```javascript
+if (response.status === 401) {
+  const isExpired = response.headers.get('Token-Expired') === 'true';
+  if (isExpired) {
+    // Redirect to login
+    window.location.href = '/login';
+  }
+}
+```
+
+---
+
+### 2.5 Roles & Permissions
+
+| Role | RoleID | Permissions |
+|------|--------|-------------|
+| **Admin** | 1 | Full access to all endpoints |
+| **User** | 2 | Own resources + public endpoints |
+| **Moderator** | 3 | Limited admin features |
+
+**Role-Based Access:**
+
+| Action | Admin | Moderator | User |
+|--------|-------|-----------|------|
+| Create own post | ? | ? | ? |
+| Edit own post | ? | ? | ? |
+| Edit any post | ? | ? | ? |
+| Delete any post | ? | ? | ? |
+| Create category | ? | ? | ? |
+| Manage users | ? | ? | ? |
+| View admin dashboard | ? | ? | ? |
+
+---
+
+## 3. Error Handling
+
+### 3.1 Error Response Format
+
+All errors follow the **RFC 7807 Problem Details** format:
+
+```json
+{
+  "title": "Error Title",
+  "detail": "Detailed error message for developers",
+  "status": 400
+}
+```
+
+### 3.2 HTTP Status Codes
+
+| Code | Meaning | When Used |
+|------|---------|-----------|
+| `200` | OK | Successful GET/PUT |
+| `201` | Created | Successful POST |
+| `204` | No Content | Successful DELETE |
+| `400` | Bad Request | Validation errors, invalid input |
+| `401` | Unauthorized | Missing or invalid token |
+| `403` | Forbidden | Valid token, insufficient permissions |
+| `404` | Not Found | Resource doesn't exist |
+| `500` | Server Error | Internal server error |
+
+### 3.3 Validation Errors
+
+When request validation fails, the API returns a `ValidationProblemDetails`:
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "Username": ["Username is required."],
+    "Email": ["Invalid email format."],
+    "Password": ["Password must be at least 6 characters."]
+  }
+}
+```
+
+**Frontend Handling Example:**
+
+```javascript
+if (response.status === 400) {
+  const data = await response.json();
+  if (data.errors) {
+    // Handle validation errors
+    Object.entries(data.errors).forEach(([field, messages]) => {
+      console.log(`${field}: ${messages.join(', ')}`);
+    });
+  }
+}
+```
+
+---
+
+## 4. Users API
+
+### 4.1 Get Current User (Profile)
+
+Returns the authenticated user's profile.
+
+```http
+GET /api/users/me
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "userID": 5,
+  "username": "johndoe",
+  "email": "john@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "joinDate": "2024-01-15T10:30:00Z",
+  "status": 0,
+  "roleID": 2,
+  "isDeleted": false,
+  "fullName": "John Doe"
+}
+```
+
+---
+
+### 4.2 Get User by ID
+
+Retrieves a specific user. Users can only view their own profile unless Admin.
+
+```http
+GET /api/users/{id}
+Authorization: Bearer {token}
+```
+
+**Response:** Same as above.
+
+---
+
+### 4.3 Check if User Exists
+
+```http
+GET /api/users/{id}/exists
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+
+```json
+true
+```
+
+---
+
+### 4.4 Update User
+
+Updates user profile. Users can only update their own profile unless Admin.
+
+```http
+PUT /api/users/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "username": "johndoe_updated",
+  "password": "NewSecurePass123",
+  "email": "john.updated@example.com",
+  "firstName": "John",
+  "lastName": "Doe Updated",
+  "status": 0,
+  "roleID": 2,
+  "isDeleted": false
+}
+```
+
+> ?? **Note:** Non-admin users cannot change their `roleID`.
+
+---
+
+### 4.5 Change Password
+
+Dedicated endpoint for password changes.
+
+```http
+PUT /api/users/{id}/password
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "currentPassword": "OldPassword123",
+  "newPassword": "NewSecurePass456",
+  "confirmPassword": "NewSecurePass456"
+}
+```
+
+**Validation:**
+- `newPassword` must be 6-100 characters
+- `confirmPassword` must match `newPassword`
+
+**Response (204 No Content):** Password changed successfully.
+
+---
+
+### 4.6 Delete User
+
+Soft-deletes a user account. Users can only delete their own account unless Admin.
+
+```http
+DELETE /api/users/{id}
+Authorization: Bearer {token}
+```
+
+**Response (204 No Content):** User deleted successfully.
+
+---
+
+### 4.7 Get All Users (Admin Only)
+
+```http
+GET /api/users
+Authorization: Bearer {admin_token}
+```
+
+**Response (200 OK):**
+
+```json
+[
+  {
+    "userID": 1,
+    "username": "admin",
+    "email": "admin@tijarahjo.com",
+    "firstName": "Admin",
+    "lastName": null,
+    "joinDate": "2024-01-01T00:00:00Z",
+    "status": 0,
+    "roleID": 1,
+    "isDeleted": false,
+    "fullName": "Admin"
+  },
+  ...
+]
+```
+
+---
+
+## 5. User Images API
+
+Manage profile images for users.
+
+### 5.1 Get User Images
+
+```http
+GET /api/users/{userId}/images
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "userID": 5,
+  "images": [
+    {
+      "userImageID": 12,
+      "userID": 5,
+      "imageURL": "https://api.tijarahjo.com/uploads/users/5/5_abc123_20240115.jpg",
+      "uploadedAt": "2024-01-15T10:30:00Z",
+      "isDeleted": false
+    }
+  ],
+  "totalCount": 1,
+  "primaryImageUrl": "https://api.tijarahjo.com/uploads/users/5/5_abc123_20240115.jpg"
+}
+```
+
+---
+
+### 5.2 Get Specific Image
+
+```http
+GET /api/users/{userId}/images/{imageId}
+```
+
+---
+
+### 5.3 Upload Image (File)
+
+Upload a profile image via file upload.
+
+```http
+POST /api/users/{userId}/images/upload
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+```
+
+**Form Data:**
+- `file`: Image file (jpg, jpeg, png, gif, webp)
+
+**Constraints:**
+- Max file size: **5 MB**
+- Allowed extensions: `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`
+
+**Response (201 Created):**
+
+```json
+{
+  "success": true,
+  "image": {
+    "userImageID": 15,
+    "userID": 5,
+    "imageURL": "https://api.tijarahjo.com/uploads/users/5/5_def456_20240115.jpg",
+    "uploadedAt": "2024-01-15T11:00:00Z",
+    "isDeleted": false
+  },
+  "fileSizeBytes": 245678
+}
+```
+
+**JavaScript Example:**
+
+```javascript
+const formData = new FormData();
+formData.append('file', imageFile);
+
+const response = await fetch(`/api/users/${userId}/images/upload`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`
+  },
+  body: formData
+});
+```
+
+---
+
+### 5.4 Upload Image (Base64)
+
+Upload a profile image via Base64 encoded string.
+
+```http
+POST /api/users/{userId}/images/upload-base64
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "imageData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+}
+```
+
+> **Note:** The `imageData` can include the data URI prefix or just the raw Base64 string.
+
+---
+
+### 5.5 Create Image from URL
+
+Create an image record from an existing URL.
+
+```http
+POST /api/users/{userId}/images
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "imageURL": "https://example.com/existing-image.jpg"
+}
+```
+
+---
+
+### 5.6 Update Image
+
+```http
+PUT /api/users/{userId}/images/{imageId}
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "imageURL": "https://example.com/new-image.jpg",
+  "isDeleted": false
+}
+```
+
+---
+
+### 5.7 Delete Image
+
+```http
+DELETE /api/users/{userId}/images/{imageId}
+Authorization: Bearer {token}
+```
+
+**Response (204 No Content):** Image deleted successfully.
+
+---
+
+## 6. Posts API
+
+Manage marketplace listings.
+
+### 6.1 Get All Posts
+
+Retrieves all posts (basic info).
+
+```http
+GET /api/posts
+```
+
+**Response (200 OK):**
+
+```json
+[
+  {
+    "postID": 1,
+    "userID": 5,
+    "categoryID": 3,
+    "postTitle": "iPhone 14 Pro - Like New",
+    "postDescription": "Selling my iPhone 14 Pro, excellent condition...",
+    "price": 899.99,
+    "status": 2,
+    "createdAt": "2024-01-10T08:00:00Z",
+    "isDeleted": false
+  },
+  ...
+]
+```
+
+---
+
+### 6.2 Get Paginated Posts
+
+Retrieves posts with pagination and optional filtering.
+
+```http
+GET /api/posts/paginated?pageNumber=1&rowsPerPage=10&categoryID=3
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `pageNumber` | int | 1 | Page number (1-based) |
+| `rowsPerPage` | int | 10 | Items per page (max 200) |
+| `includeDeleted` | bool | false | Include soft-deleted posts |
+| `categoryID` | int? | null | Filter by category |
+
+**Response (200 OK):**
+
+```json
+{
+  "items": [
+    {
+      "postID": 1,
+      "postTitle": "iPhone 14 Pro - Like New",
+      "postDescription": "Selling my iPhone 14 Pro...",
+      "price": 899.99,
+      "status": 2,
+      "createdAt": "2024-01-10T08:00:00Z",
+      "isDeleted": false,
+      "userID": 5,
+      "username": "johndoe",
+      "email": "john@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "sellerFullName": "John Doe",
+      "roleID": 2,
+      "roleName": "User",
+      "categoryID": 3,
+      "categoryName": "Electronics"
+    }
+  ],
+  "pageNumber": 1,
+  "rowsPerPage": 10,
+  "totalCount": 45,
+  "totalPages": 5,
+  "hasPreviousPage": false,
+  "hasNextPage": true
+}
+```
+
+---
+
+### 6.3 Get Post by ID
+
+```http
+GET /api/posts/{id}
+```
+
+Returns basic post information.
+
+---
+
+### 6.4 Get Post Details
+
+Returns comprehensive post information including owner, category, reviews, and images.
+
+```http
+GET /api/posts/{id}/details
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "postID": 1,
+  "postTitle": "iPhone 14 Pro - Like New",
+  "postDescription": "Selling my iPhone 14 Pro, excellent condition...",
+  "price": 899.99,
+  "status": 2,
+  "createdAt": "2024-01-10T08:00:00Z",
+  "isDeleted": false,
+  
+  "ownerUserID": 5,
+  "ownerUsername": "johndoe",
+  "ownerEmail": "john@example.com",
+  "ownerFirstName": "John",
+  "ownerLastName": "Doe",
+  "ownerFullName": "John Doe",
+  
+  "roleID": 2,
+  "roleName": "User",
+  
+  "categoryID": 3,
+  "categoryName": "Electronics",
+  
+  "reviews": [
+    {
+      "reviewID": 10,
+      "postID": 1,
+      "rating": 5,
+      "reviewText": "Great seller, item as described!",
+      "createdAt": "2024-01-12T14:00:00Z",
+      "reviewerUserID": 8,
+      "reviewerUsername": "buyer123",
+      "reviewerEmail": "buyer@example.com",
+      "reviewerFirstName": "Jane",
+      "reviewerLastName": "Smith",
+      "reviewerFullName": "Jane Smith"
+    }
+  ],
+  
+  "images": [
+    {
+      "postImageID": 5,
+      "postID": 1,
+      "postImageURL": "https://api.tijarahjo.com/uploads/posts/1/1_img1_20240110.jpg",
+      "uploadedAt": "2024-01-10T08:05:00Z"
+    }
+  ],
+  
+  "reviewCount": 1,
+  "averageRating": 5.0,
+  "imageCount": 1,
+  "primaryImageUrl": "https://api.tijarahjo.com/uploads/posts/1/1_img1_20240110.jpg"
+}
+```
+
+---
+
+### 6.5 Check if Post Exists
+
+```http
+GET /api/posts/{id}/exists
+```
+
+---
+
+### 6.6 Create Post
+
+Creates a new marketplace listing.
+
+```http
+POST /api/posts
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "userID": 5,
+  "categoryID": 3,
+  "postTitle": "MacBook Pro M3 - Brand New",
+  "postDescription": "Selling brand new MacBook Pro M3...",
+  "price": 1999.99,
+  "status": 0
+}
+```
+
+**Validation Rules:**
+
+| Field | Required | Rules |
+|-------|----------|-------|
+| `userID` | ? | Positive integer |
+| `categoryID` | ? | Positive integer |
+| `postTitle` | ? | 3-200 characters |
+| `postDescription` | ? | Max 5000 characters |
+| `price` | ? | Non-negative decimal |
+| `status` | ? | Default: 0 (Draft) |
+
+**Post Status Values:**
+
+| Status | Value | Description |
+|--------|-------|-------------|
+| Draft | 0 | Not published |
+| Pending Review | 1 | Awaiting approval |
+| Active | 2 | Published and visible |
+| Sold | 3 | Item sold |
+| Expired | 4 | Listing expired |
+| Rejected | 5 | Rejected by admin |
+| Removed | 6 | Removed by admin |
+| Deleted | 7 | Soft deleted |
+
+> **Note:** Non-admin users can only create posts for themselves.
+
+---
+
+### 6.7 Update Post
+
+Updates an existing post. Users can only update their own posts unless Admin.
+
+```http
+PUT /api/posts/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "userID": 5,
+  "categoryID": 3,
+  "postTitle": "MacBook Pro M3 - Updated Price",
+  "postDescription": "Updated description...",
+  "price": 1899.99,
+  "status": 2,
+  "isDeleted": false
+}
+```
+
+> ?? **Note:** Non-admin users cannot transfer post ownership (change `userID`).
+
+---
+
+### 6.8 Delete Post
+
+Soft-deletes a post. Users can only delete their own posts unless Admin.
+
+```http
+DELETE /api/posts/{id}
+Authorization: Bearer {token}
+```
+
+---
+
+## 7. Post Images API
+
+Manage images for marketplace posts.
+
+### 7.1 Get Post Images
+
+```http
+GET /api/posts/{postId}/images
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "postID": 1,
+  "images": [
+    {
+      "postImageID": 5,
+      "postID": 1,
+      "postImageURL": "https://api.tijarahjo.com/uploads/posts/1/1_img1_20240110.jpg",
+      "uploadedAt": "2024-01-10T08:05:00Z",
+      "isDeleted": false
+    }
+  ],
+  "totalCount": 1,
+  "primaryImageUrl": "https://api.tijarahjo.com/uploads/posts/1/1_img1_20240110.jpg"
+}
+```
+
+---
+
+### 7.2 Get Specific Image
+
+```http
+GET /api/posts/{postId}/images/{imageId}
+```
+
+---
+
+### 7.3 Check if Image Exists
+
+```http
+GET /api/posts/{postId}/images/{imageId}/exists
+```
+
+---
+
+### 7.4 Upload Image (File)
+
+```http
+POST /api/posts/{postId}/images/upload
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+```
+
+**Form Data:**
+- `file`: Image file
+
+**Constraints:**
+- Max file size: **5 MB**
+- Allowed extensions: `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`
+
+**Response (201 Created):**
+
+```json
+{
+  "success": true,
+  "image": {
+    "postImageID": 10,
+    "postID": 1,
+    "postImageURL": "https://api.tijarahjo.com/uploads/posts/1/1_abc123_20240115.jpg",
+    "uploadedAt": "2024-01-15T10:00:00Z",
+    "isDeleted": false
+  },
+  "fileSizeBytes": 345678
+}
+```
+
+---
+
+### 7.5 Upload Image (Base64)
+
+```http
+POST /api/posts/{postId}/images/upload-base64
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "imageData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD..."
+}
+```
+
+---
+
+### 7.6 Create Image from URL
+
+```http
+POST /api/posts/{postId}/images
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "postImageURL": "https://example.com/product-image.jpg"
+}
+```
+
+---
+
+### 7.7 Update Image
+
+```http
+PUT /api/posts/{postId}/images/{imageId}
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "postImageURL": "https://example.com/new-product-image.jpg",
+  "isDeleted": false
+}
+```
+
+---
+
+### 7.8 Delete Image
+
+```http
+DELETE /api/posts/{postId}/images/{imageId}
+Authorization: Bearer {token}
+```
+
+---
+
+## 8. Post Reviews API
+
+Manage reviews for marketplace posts.
+
+### 8.1 Get Post Reviews
+
+```http
+GET /api/posts/{postId}/reviews
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "postID": 1,
+  "reviews": [
+    {
+      "reviewID": 10,
+      "postID": 1,
+      "userID": 8,
+      "rating": 5,
+      "reviewText": "Excellent product and seller!",
+      "createdAt": "2024-01-12T14:00:00Z",
+      "isDeleted": false
+    },
+    {
+      "reviewID": 11,
+      "postID": 1,
+      "userID": 12,
+      "rating": 4,
+      "reviewText": "Good condition, fast shipping.",
+      "createdAt": "2024-01-13T09:30:00Z",
+      "isDeleted": false
+    }
+  ],
+  "totalCount": 2,
+  "averageRating": 4.5,
+  "ratingDistribution": {
+    "5": 1,
+    "4": 1
+  }
+}
+```
+
+---
+
+### 8.2 Get Specific Review
+
+```http
+GET /api/posts/{postId}/reviews/{reviewId}
+```
+
+---
+
+### 8.3 Check if Review Exists
+
+```http
+GET /api/posts/{postId}/reviews/{reviewId}/exists
+```
+
+---
+
+### 8.4 Create Review
+
+Creates a new review for a post.
+
+```http
+POST /api/posts/{postId}/reviews
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "userID": 8,
+  "rating": 5,
+  "reviewText": "Amazing product! Highly recommend this seller."
+}
+```
+
+**Validation Rules:**
+
+| Field | Required | Rules |
+|-------|----------|-------|
+| `userID` | ? | Positive integer |
+| `rating` | ? | 1-5 (byte) |
+| `reviewText` | ? | Max 1000 characters |
+
+**Response (201 Created):**
+
+```json
+{
+  "reviewID": 15,
+  "postID": 1,
+  "userID": 8,
+  "rating": 5,
+  "reviewText": "Amazing product! Highly recommend this seller.",
+  "createdAt": "2024-01-15T16:00:00Z",
+  "isDeleted": false
+}
+```
+
+---
+
+### 8.5 Update Review
+
+```http
+PUT /api/posts/{postId}/reviews/{reviewId}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "rating": 4,
+  "reviewText": "Updated review text.",
+  "isDeleted": false
+}
+```
+
+---
+
+### 8.6 Delete Review
+
+```http
+DELETE /api/posts/{postId}/reviews/{reviewId}
+```
+
+---
+
+## 9. Categories API
+
+### 9.1 Get All Categories
+
+```http
+GET /api/categories
+```
+
+**Response (200 OK):**
+
+```json
+[
+  {
+    "categoryID": 1,
+    "categoryName": "Vehicles",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "isDeleted": false
+  },
+  {
+    "categoryID": 2,
+    "categoryName": "Real Estate",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "isDeleted": false
+  },
+  {
+    "categoryID": 3,
+    "categoryName": "Electronics",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "isDeleted": false
+  }
+]
+```
+
+---
+
+### 9.2 Get Category by ID
+
+```http
+GET /api/categories/{id}
+```
+
+---
+
+### 9.3 Check if Category Exists
+
+```http
+GET /api/categories/{id}/exists
+```
+
+---
+
+### 9.4 Create Category (Admin Only)
+
+```http
+POST /api/categories
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "categoryName": "Fashion"
+}
+```
+
+**Validation:**
+- `categoryName`: Required, 2-100 characters
+
+---
+
+### 9.5 Update Category (Admin Only)
+
+```http
+PUT /api/categories/{id}
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "categoryName": "Fashion & Apparel",
+  "isDeleted": false
+}
+```
+
+---
+
+### 9.6 Delete Category (Admin Only)
+
+```http
+DELETE /api/categories/{id}
+Authorization: Bearer {admin_token}
+```
+
+---
+
+## 10. Roles API
+
+### 10.1 Get All Roles
+
+```http
+GET /api/roles
+```
+
+**Response (200 OK):**
+
+```json
+[
+  {
+    "roleID": 1,
+    "roleName": "Admin",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "isDeleted": false
+  },
+  {
+    "roleID": 2,
+    "roleName": "User",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "isDeleted": false
+  },
+  {
+    "roleID": 3,
+    "roleName": "Moderator",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "isDeleted": false
+  }
+]
+```
+
+---
+
+### 10.2 Get Role by ID
+
+```http
+GET /api/roles/{id}
+```
+
+---
+
+### 10.3 Check if Role Exists
+
+```http
+GET /api/roles/{id}/exists
+```
+
+---
+
+### 10.4 Create Role (Admin Only)
+
+```http
+POST /api/roles
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "roleName": "Support"
+}
+```
+
+---
+
+### 10.5 Update Role (Admin Only)
+
+```http
+PUT /api/roles/{id}
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+```
+
+---
+
+### 10.6 Delete Role (Admin Only)
+
+```http
+DELETE /api/roles/{id}
+Authorization: Bearer {admin_token}
+```
+
+> ?? **Note:** Core roles (Admin, User, Moderator - IDs 1-3) cannot be deleted.
+
+---
+
+## 11. Admin API
+
+All endpoints in this section require **Admin role**.
+
+### 11.1 Dashboard Statistics
+
+```http
+GET /api/admin/dashboard
+Authorization: Bearer {admin_token}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "generatedAt": "2024-01-15T10:00:00Z",
+  "generatedByAdminId": 1,
+  
+  "totalUsers": 150,
+  "activeUsers": 142,
+  "deletedUsers": 8,
+  
+  "totalPosts": 523,
+  "activePosts": 480,
+  "deletedPosts": 43,
+  "draftPosts": 25,
+  "pendingReviewPosts": 12,
+  "publishedPosts": 443,
+  
+  "totalCategories": 10,
+  "totalRoles": 3
+}
+```
+
+---
+
+### 11.2 User Management
+
+#### Get All Users (Admin)
+
+```http
+GET /api/admin/users?includeDeleted=true
+Authorization: Bearer {admin_token}
+```
+
+**Response:**
+
+```json
+{
+  "users": [
+    {
+      "userID": 5,
+      "username": "johndoe",
+      "email": "john@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "joinDate": "2024-01-15T00:00:00Z",
+      "status": 0,
+      "statusName": "Active",
+      "roleID": 2,
+      "roleName": "User",
+      "isDeleted": false,
+      "fullName": "John Doe"
+    }
+  ],
+  "totalCount": 150,
+  "activeCount": 142,
+  "deletedCount": 8
+}
+```
+
+---
+
+#### Get User Details (Admin)
+
+```http
+GET /api/admin/users/{id}
+Authorization: Bearer {admin_token}
+```
+
+**Response:** Includes activity statistics (`totalPosts`, `totalImages`).
+
+---
+
+#### Update User Role
+
+```http
+PUT /api/admin/users/{id}/role
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "roleID": 3
+}
+```
+
+> ?? Admins cannot demote themselves.
+
+---
+
+#### Update User Status
+
+```http
+PUT /api/admin/users/{id}/status
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "status": 2,
+  "reason": "Violation of terms of service"
+}
+```
+
+**Status Values:**
+
+| Status | Value | Description |
+|--------|-------|-------------|
+| Active | 0 | Normal account |
+| Inactive | 1 | Deactivated by user |
+| Banned | 2 | Permanently banned |
+| Suspended | 3 | Temporarily suspended |
+
+> ?? Admins cannot change their own status.
+
+---
+
+#### Permanently Delete User
+
+```http
+DELETE /api/admin/users/{id}/permanent
+Authorization: Bearer {admin_token}
+```
+
+> ?? This action cannot be undone. Admins cannot delete themselves.
+
+---
+
+#### Restore Deleted User
+
+```http
+POST /api/admin/users/{id}/restore
+Authorization: Bearer {admin_token}
+```
+
+---
+
+### 11.3 Post Management
+
+#### Get All Posts (Admin)
+
+```http
+GET /api/admin/posts?includeDeleted=true
+Authorization: Bearer {admin_token}
+```
+
+**Response:**
+
+```json
+{
+  "posts": [
+    {
+      "postID": 1,
+      "userID": 5,
+      "categoryID": 3,
+      "postTitle": "iPhone 14 Pro",
+      "postDescription": "...",
+      "price": 899.99,
+      "status": 2,
+      "statusName": "Active",
+      "createdAt": "2024-01-10T00:00:00Z",
+      "isDeleted": false
+    }
+  ],
+  "totalCount": 523,
+  "byStatus": {
+    "Draft": 25,
+    "PendingReview": 12,
+    "Active": 443,
+    "Sold": 35,
+    "Deleted": 8
+  }
+}
+```
+
+---
+
+#### Update Post Status
+
+```http
+PUT /api/admin/posts/{id}/status
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "status": 5,
+  "reason": "Prohibited item"
+}
+```
+
+---
+
+#### Delete Post (Admin)
+
+```http
+DELETE /api/admin/posts/{id}
+Authorization: Bearer {admin_token}
+```
+
+---
+
+### 11.4 Category & Role Management
+
+```http
+GET /api/admin/categories
+GET /api/admin/roles
+Authorization: Bearer {admin_token}
+```
+
+---
+
+## 12. Data Models Reference
+
+### User Status
+
+| Value | Name | Description |
+|-------|------|-------------|
+| 0 | Active | Normal active account |
+| 1 | Inactive | Deactivated by user |
+| 2 | Banned | Permanently banned |
+| 3 | Suspended | Temporarily suspended |
+
+### Post Status
+
+| Value | Name | Description |
+|-------|------|-------------|
+| 0 | Draft | Not published yet |
+| 1 | PendingReview | Awaiting admin approval |
+| 2 | Active | Published and visible |
+| 3 | Sold | Item has been sold |
+| 4 | Expired | Listing has expired |
+| 5 | Rejected | Rejected by admin |
+| 6 | Removed | Removed by admin |
+| 7 | Deleted | Soft deleted |
+
+### Role IDs
+
+| RoleID | Name | Description |
+|--------|------|-------------|
+| 1 | Admin | Full system access |
+| 2 | User | Standard user |
+| 3 | Moderator | Limited admin features |
+
+### Image Upload Constraints
+
+| Constraint | Value |
+|------------|-------|
+| Max file size | 5 MB |
+| Allowed formats | `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp` |
+| URL pattern | `/uploads/{category}/{entityId}/{filename}` |
+
+---
+
+## 13. Quick Reference Table
+
+### Public Endpoints (No Auth Required)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/users/register` | Register new user |
+| `POST` | `/api/users/login` | Login and get token |
+| `GET` | `/api/posts` | Get all posts |
+| `GET` | `/api/posts/paginated` | Get paginated posts |
+| `GET` | `/api/posts/{id}` | Get post by ID |
+| `GET` | `/api/posts/{id}/details` | Get full post details |
+| `GET` | `/api/posts/{id}/exists` | Check post exists |
+| `GET` | `/api/posts/{postId}/images` | Get post images |
+| `GET` | `/api/posts/{postId}/reviews` | Get post reviews |
+| `POST` | `/api/posts/{postId}/reviews` | Create review |
+| `GET` | `/api/categories` | Get all categories |
+| `GET` | `/api/categories/{id}` | Get category by ID |
+| `GET` | `/api/roles` | Get all roles |
+| `GET` | `/api/users/{userId}/images` | Get user images |
+
+### Authenticated Endpoints (Token Required)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/users/me` | Get current user profile |
+| `GET` | `/api/users/{id}` | Get user by ID |
+| `PUT` | `/api/users/{id}` | Update user |
+| `PUT` | `/api/users/{id}/password` | Change password |
+| `DELETE` | `/api/users/{id}` | Delete user |
+| `POST` | `/api/posts` | Create post |
+| `PUT` | `/api/posts/{id}` | Update post |
+| `DELETE` | `/api/posts/{id}` | Delete post |
+| `POST` | `/api/users/{id}/images/upload` | Upload user image |
+| `POST` | `/api/posts/{id}/images/upload` | Upload post image |
+| `DELETE` | `/api/users/{userId}/images/{imageId}` | Delete user image |
+| `DELETE` | `/api/posts/{postId}/images/{imageId}` | Delete post image |
+
+### Admin-Only Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/users` | Get all users |
+| `POST` | `/api/users` | Create user with role |
+| `GET` | `/api/admin/dashboard` | Dashboard statistics |
+| `GET` | `/api/admin/users` | Admin user list |
+| `PUT` | `/api/admin/users/{id}/role` | Update user role |
+| `PUT` | `/api/admin/users/{id}/status` | Update user status |
+| `POST` | `/api/admin/users/{id}/restore` | Restore deleted user |
+| `DELETE` | `/api/admin/users/{id}/permanent` | Permanently delete user |
+| `GET` | `/api/admin/posts` | Admin post list |
+| `PUT` | `/api/admin/posts/{id}/status` | Update post status |
+| `DELETE` | `/api/admin/posts/{id}` | Delete any post |
+| `POST` | `/api/categories` | Create category |
+| `PUT` | `/api/categories/{id}` | Update category |
+| `DELETE` | `/api/categories/{id}` | Delete category |
+| `POST` | `/api/roles` | Create role |
+| `PUT` | `/api/roles/{id}` | Update role |
+| `DELETE` | `/api/roles/{id}` | Delete role |
+
+---
+
+## Appendix: Frontend Code Examples
+
+### Authentication Service (JavaScript/TypeScript)
+
+```typescript
+class AuthService {
+  private baseUrl = '/api';
+  private tokenKey = 'jwt_token';
+
+  async login(login: string, password: string): Promise<LoginResponse> {
+    const response = await fetch(`${this.baseUrl}/users/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login, password })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Login failed');
+    }
+
+    const data = await response.json();
+    localStorage.setItem(this.tokenKey, data.token);
+    return data;
+  }
+
+  async register(userData: RegisterRequest): Promise<UserResponse> {
+    const response = await fetch(`${this.baseUrl}/users/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Registration failed');
+    }
+
+    return response.json();
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  logout(): void {
+    localStorage.removeItem(this.tokenKey);
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+}
+```
+
+### API Client with Token Handling
+
+```typescript
+class ApiClient {
+  private baseUrl = '/api';
+
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const token = localStorage.getItem('jwt_token');
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
+    // Handle token expiration
+    if (response.status === 401) {
+      const isExpired = response.headers.get('Token-Expired') === 'true';
+      if (isExpired) {
+        localStorage.removeItem('jwt_token');
+        window.location.href = '/login?expired=true';
+      }
+      throw new Error('Unauthorized');
+    }
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Request failed');
+    }
+
+    // Handle 204 No Content
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    return response.json();
+  }
+
+  // Users
+  getCurrentUser() {
+    return this.request<UserResponse>('/users/me');
+  }
+
+  // Posts
+  getPaginatedPosts(params: PaginationParams) {
+    const query = new URLSearchParams(params as any).toString();
+    return this.request<PaginatedResponse<PostListingResponse>>(
+      `/posts/paginated?${query}`
+    );
+  }
+
+  getPostDetails(id: number) {
+    return this.request<PostDetailsResponse>(`/posts/${id}/details`);
+  }
+
+  createPost(data: CreatePostRequest) {
+    return this.request<PostResponse>('/posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Reviews
+  createReview(postId: number, data: CreateReviewRequest) {
+    return this.request<ReviewResponse>(`/posts/${postId}/reviews`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+}
+```
+
+### Image Upload Example
+
+```typescript
+async function uploadPostImage(postId: number, file: File): Promise<PostImageUploadResponse> {
+  const token = localStorage.getItem('jwt_token');
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch(`/api/posts/${postId}/images/upload`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.errorMessage || 'Upload failed');
+  }
+
+  return response.json();
+}
+```
+
+---
+
+## Document Information
+
+| Property | Value |
+|----------|-------|
+| API Version | 1.0 |
+| Framework | .NET 8 |
+| Authentication | JWT Bearer |
+| Documentation Date | January 2024 |
+| Repository | TijarahJo-Backend |
+
+---
+
+*This documentation is auto-generated based on the TijarahJo API backend codebase.*

@@ -1,0 +1,1247 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using TijarahJoDB.BLL;
+using Models;
+using TijarahJoDBAPI.DTOs.Requests;
+using TijarahJoDBAPI.DTOs.Responses;
+using TijarahJoDBAPI.DTOs.Mappers;
+using TijarahJoDBAPI.Extensions;
+using TijarahJoDBAPI.Services;
+using TijarahJoDBAPI.Services.Security;
+
+namespace TijarahJoDBAPI.Controllers
+{
+    /// <summary>
+    /// Comprehensive controller for users and their related resources.
+    /// This is a composite controller that manages:
+    /// - Users (CRUD operations, authentication)
+    /// - User Images (nested under /api/users/{userId}/images)
+    /// </summary>
+    [ApiController]
+    [Route("api/users")]
+    [Produces("application/json")]
+    public class UsersController : ControllerBase
+    {
+        // Role ID constants matching database
+        private const int RoleId_Admin = 1;
+        private const int RoleId_User = 2;
+        private const int RoleId_Moderator = 3;
+
+        private readonly TokenService _tokenService;
+        private readonly JwtOptions _jwtOptions;
+        private readonly ISecurityService _securityService;
+        private readonly ImageUploadService _imageUploadService;
+
+        public UsersController(
+            TokenService tokenService, 
+            JwtOptions jwtOptions,
+            ISecurityService securityService,
+            ImageUploadService imageUploadService)
+        {
+            _tokenService = tokenService;
+            _jwtOptions = jwtOptions;
+            _securityService = securityService;
+            _imageUploadService = imageUploadService;
+        }
+
+        #region ==================== USER CRUD & AUTHENTICATION ====================
+
+        #region GET - Users
+
+        /// <summary>
+        /// Retrieves all users (Admin only)
+        /// </summary>
+        /// <returns>A list of all users</returns>
+        [HttpGet]
+        [Authorize(Roles = RoleNames.Admin)]
+        [EndpointSummary("Retrieves all users")]
+        [EndpointDescription("Returns a list of all registered users in the system. Admin only.")]
+        [EndpointName("GetAllUsers")]
+        [ProducesResponseType(typeof(IEnumerable<UserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public ActionResult<IEnumerable<UserResponse>> GetAll()
+        {
+            var usersList = UserBL.GetAllTbUsers();
+
+            if (usersList == null || usersList.Rows.Count == 0)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "No Users Found",
+                    Detail = "There are no users registered in the system.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var responseList = new List<UserResponse>();
+
+            foreach (System.Data.DataRow row in usersList.Rows)
+            {
+                responseList.Add(new UserResponse
+                {
+                    UserID = (int?)row["UserID"],
+                    Username = (string)row["Username"],
+                    Email = (string)row["Email"],
+                    FirstName = (string)row["FirstName"],
+                    LastName = row["LastName"] == DBNull.Value ? null : (string)row["LastName"],
+                    PrimaryPhone = row.Table.Columns.Contains("PrimaryPhone") && row["PrimaryPhone"] != DBNull.Value 
+                        ? (string)row["PrimaryPhone"] : null,
+                    JoinDate = (DateTime)row["JoinDate"],
+                    Status = (int)row["Status"],
+                    RoleID = (int)row["RoleID"],
+                    IsDeleted = (bool)row["IsDeleted"]
+                });
+            }
+
+            return Ok(responseList);
+        }
+
+        /// <summary>
+        /// Retrieves a user by ID
+        /// </summary>
+        /// <param name="id">The user ID</param>
+        /// <returns>The user details</returns>
+        [HttpGet("{id:int}", Name = "GetUserById")]
+        [Authorize]
+        [EndpointSummary("Retrieves a user by ID")]
+        [EndpointDescription("Returns detailed information about a specific user. Users can only view their own profile unless Admin.")]
+        [EndpointName("GetUserById")]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public ActionResult<UserResponse> GetById(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            // Check if user is accessing their own data or is admin
+            if (!User.IsOwnerOrAdmin(id))
+            {
+                return Forbid();
+            }
+
+            UserBL user = UserBL.Find(id);
+
+            if (user == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{id}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return Ok(user.UserModel.ToResponse());
+        }
+
+        /// <summary>
+        /// Gets the current authenticated user's profile
+        /// </summary>
+        /// <returns>Current user's profile</returns>
+        [HttpGet("me")]
+        [Authorize]
+        [EndpointSummary("Gets current user profile")]
+        [EndpointDescription("Returns the profile of the currently authenticated user based on JWT token.")]
+        [EndpointName("GetCurrentUser")]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult<UserResponse> GetCurrentUser()
+        {
+            var userId = User.GetUserId();
+
+            if (userId == null)
+            {
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Invalid Token",
+                    Detail = "User ID not found in token.",
+                    Status = StatusCodes.Status401Unauthorized
+                });
+            }
+
+            var user = UserBL.Find(userId);
+
+            if (user == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = "User account no longer exists.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return Ok(user.UserModel.ToResponse());
+        }
+
+        /// <summary>
+        /// Checks if a user exists
+        /// </summary>
+        /// <param name="id">The user ID to check</param>
+        /// <returns>Boolean indicating existence</returns>
+        [HttpGet("{id:int}/exists")]
+        [Authorize]
+        [EndpointSummary("Checks if a user exists")]
+        [EndpointDescription("Returns true if a user with the specified ID exists, false otherwise.")]
+        [EndpointName("CheckUserExists")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> Exists(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            return Ok(UserBL.DoesUserExist(id));
+        }
+
+        #endregion
+
+        #region POST - Users (Registration, Admin Create & Login)
+
+        /// <summary>
+        /// Public user registration - automatically assigns User role (RoleID = 2)
+        /// </summary>
+        /// <param name="request">The user registration data</param>
+        /// <returns>The created user</returns>
+        /// <remarks>
+        /// This endpoint is for public self-registration. 
+        /// Role is automatically set to "User" (RoleID = 2).
+        /// For admin user creation with role selection, use POST /api/users (Admin only).
+        /// </remarks>
+        [HttpPost("register")]
+        [EndpointSummary("Public user registration")]
+        [EndpointDescription("Creates a new user account with User role (RoleID=2). For admin user creation with role selection, use POST /api/users.")]
+        [EndpointName("RegisterUser")]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<UserResponse> Register([FromBody] RegisterUserRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Hash password using PBKDF2 before storing
+            string hashedPassword = _securityService.HashPassword(request.Password);
+
+            // Create user model (phone will be added separately)
+            UserBL user = new UserBL(new UserModel
+            (
+                null,
+                request.Username,
+                hashedPassword,
+                request.Email,
+                request.FirstName,
+                request.LastName,
+                DateTime.UtcNow,
+                0,              // Default status = 0 (active)
+                RoleId_User,    // Always User role for public registration
+                false
+            ));
+
+            // Save with phone if provided
+            bool saved = !string.IsNullOrEmpty(request.PhoneNumber)
+                ? user.SaveWithPhone(request.PhoneNumber)
+                : user.Save();
+
+            if (!saved)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Registration Failed",
+                    Detail = "An error occurred while creating the user account.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = user.UserModel.ToResponse();
+
+            return CreatedAtRoute("GetUserById", new { id = response.UserID }, response);
+        }
+
+        /// <summary>
+        /// Admin creates a new user with specific role (Admin only)
+        /// </summary>
+        /// <param name="request">The user data including role selection</param>
+        /// <returns>The created user</returns>
+        /// <remarks>
+        /// This endpoint is for administrators to create users with any role.
+        /// Requires Admin authentication.
+        /// 
+        /// Role IDs:
+        /// - 1 = Admin
+        /// - 2 = User  
+        /// - 3 = Moderator
+        /// </remarks>
+        [HttpPost]
+        [Authorize(Roles = RoleNames.Admin)]
+        [EndpointSummary("Admin creates user with role (Admin only)")]
+        [EndpointDescription("Creates a new user with specified role. Admin can assign any role including Admin, User, or Moderator.")]
+        [EndpointName("AdminCreateUser")]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<UserResponse> AdminCreateUser([FromBody] CreateUserRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Hash password using PBKDF2 before storing
+            string hashedPassword = _securityService.HashPassword(request.Password);
+
+            // Create user model (phone will be added separately)
+            UserBL user = new UserBL(new UserModel
+            (
+                null,
+                request.Username,
+                hashedPassword,
+                request.Email,
+                request.FirstName,
+                request.LastName,
+                DateTime.UtcNow,
+                request.Status,
+                request.RoleID,
+                false
+            ));
+
+            // Save with phone if provided
+            bool saved = !string.IsNullOrEmpty(request.PhoneNumber)
+                ? user.SaveWithPhone(request.PhoneNumber, "Mobile")
+                : user.Save();
+
+            if (!saved)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "User Creation Failed",
+                    Detail = "An error occurred while creating the user account.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = user.UserModel.ToResponse();
+
+            return CreatedAtRoute("GetUserById", new { id = response.UserID }, response);
+        }
+
+        /// <summary>
+        /// Authenticates a user
+        /// </summary>
+        /// <param name="request">Login credentials</param>
+        /// <returns>User details and authentication token</returns>
+        [HttpPost("login")]
+        [EndpointSummary("Authenticates a user")]
+        [EndpointDescription("Validates user credentials and returns an authentication token with role information.")]
+        [EndpointName("LoginUser")]
+        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            UserBL? user = UserBL.FindByLogin(request.Login);
+
+            if (user == null)
+            {
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Authentication Failed",
+                    Detail = "Invalid username/email or password.",
+                    Status = StatusCodes.Status401Unauthorized
+                });
+            }
+
+            if (!_securityService.VerifyPassword(user.HashedPassword, request.Password))
+            {
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Authentication Failed",
+                    Detail = "Invalid username/email or password.",
+                    Status = StatusCodes.Status401Unauthorized
+                });
+            }
+
+            if (user.UserID == null)
+            {
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Authentication Failed",
+                    Detail = "User account not found.",
+                    Status = StatusCodes.Status401Unauthorized
+                });
+            }
+
+            if (user.IsDeleted)
+            {
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Account Disabled",
+                    Detail = "This user account has been deleted.",
+                    Status = StatusCodes.Status401Unauthorized
+                });
+            }
+
+            if (_securityService.NeedsRehash(user.HashedPassword))
+            {
+                string newHash = _securityService.HashPassword(request.Password);
+                user.HashedPassword = newHash;
+                user.Save();
+            }
+
+            string roleName = GetRoleNameFromId(user.RoleID);
+            string token = _tokenService.CreateAuthToken(user.UserID, roleName, user.Username);
+
+            return Ok(new LoginResponse
+            {
+                User = user.UserModel.ToResponse(),
+                Token = token,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtOptions.Lifetime),
+                Role = roleName
+            });
+        }
+
+        /// <summary>
+        /// Maps RoleID to role name string
+        /// </summary>
+        private static string GetRoleNameFromId(int roleId)
+        {
+            return roleId switch
+            {
+                RoleId_Admin => RoleNames.Admin,         // 1 = Admin
+                RoleId_User => RoleNames.User,           // 2 = User
+                RoleId_Moderator => RoleNames.Moderator, // 3 = Moderator
+                _ => RoleNames.User                      // Default to User
+            };
+        }
+
+        #endregion
+
+        #region PUT - Users
+
+        /// <summary>
+        /// Updates an existing user
+        /// </summary>
+        /// <param name="id">The user ID</param>
+        /// <param name="request">The updated user data</param>
+        /// <returns>The updated user</returns>
+        [HttpPut("{id:int}")]
+        [Authorize]
+        [EndpointSummary("Updates an existing user")]
+        [EndpointDescription("Updates the details of an existing user account. Users can only update their own profile unless Admin.")]
+        [EndpointName("UpdateUser")]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public ActionResult<UserResponse> Update(int id, [FromBody] UpdateUserRequest request)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            // Check if user is updating their own data or is admin
+            if (!User.IsOwnerOrAdmin(id))
+            {
+                return Forbid();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            UserBL user = UserBL.Find(id);
+
+            if (user == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{id}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            // Regular users cannot change their own role
+            if (!User.IsAdmin() && request.RoleID != user.RoleID)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = "You cannot change your own role.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            user.Username = request.Username;
+            // Hash password if it's being updated
+            user.HashedPassword = _securityService.HashPassword(request.Password);
+            user.Email = request.Email;
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            // Note: Phone numbers are managed through the separate /phones endpoint
+            user.Status = request.Status;
+            user.RoleID = request.RoleID;
+            user.IsDeleted = request.IsDeleted;
+
+            if (!user.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Update Failed",
+                    Detail = "An error occurred while updating the user account.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            return Ok(user.UserModel.ToResponse());
+        }
+
+        /// <summary>
+        /// Changes user password
+        /// </summary>
+        [HttpPut("{id:int}/password")]
+        [Authorize]
+        [EndpointSummary("Changes user password")]
+        [EndpointDescription("Changes the password for a user. Users can only change their own password unless Admin.")]
+        [EndpointName("ChangePassword")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public ActionResult ChangePassword(int id, [FromBody] ChangePasswordRequest request)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!User.IsOwnerOrAdmin(id))
+            {
+                return Forbid();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = UserBL.Find(id);
+            if (user == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{id}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            // Verify current password (skip for admin changing other user's password)
+            if (!User.IsAdmin() || User.GetUserId() == id)
+            {
+                if (!_securityService.VerifyPassword(user.HashedPassword, request.CurrentPassword))
+                {
+                    return BadRequest(new ProblemDetails
+                    {
+                        Title = "Invalid Password",
+                        Detail = "Current password is incorrect.",
+                        Status = StatusCodes.Status400BadRequest
+                    });
+                }
+            }
+
+            // Hash and save new password
+            user.HashedPassword = _securityService.HashPassword(request.NewPassword);
+            
+            if (!user.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Update Failed",
+                    Detail = "Failed to update password.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            return NoContent();
+        }
+
+        #endregion
+
+        #region DELETE - Users
+
+        /// <summary>
+        /// Deletes a user
+        /// </summary>
+        /// <param name="id">The user ID to delete</param>
+        /// <returns>Confirmation message</returns>
+        [HttpDelete("{id:int}")]
+        [Authorize]
+        [EndpointSummary("Deletes a user")]
+        [EndpointDescription("Soft deletes a user account from the system. Users can only delete their own account unless Admin.")]
+        [EndpointName("DeleteUser")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public IActionResult Delete(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            // Check if user is deleting their own account or is admin
+            if (!User.IsOwnerOrAdmin(id))
+            {
+                return Forbid();
+            }
+
+            if (!UserBL.DeleteUser(id))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{id}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return NoContent();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region ==================== USER IMAGES ====================
+
+        #region GET - User Images
+
+        /// <summary>
+        /// Retrieves all images for a specific user
+        /// </summary>
+        /// <param name="userId">The user ID</param>
+        /// <returns>List of images for the user</returns>
+        [HttpGet("{userId:int}/images")]
+        [EndpointSummary("Retrieves all images for a user")]
+        [EndpointDescription("Returns all profile images uploaded by a specific user.")]
+        [EndpointName("GetUserImages")]
+        [ProducesResponseType(typeof(UserImagesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<UserImagesResponse> GetAllImages(int userId)
+        {
+            if (userId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid User ID",
+                    Detail = $"The provided user ID '{userId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!UserBL.DoesUserExist(userId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var imagesTable = UserImage.GetImagesByUserId(userId);
+            var images = imagesTable.ToUserImageResponseList();
+
+            var response = new UserImagesResponse
+            {
+                UserID = userId,
+                Images = images,
+                TotalCount = images.Count
+            };
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Retrieves a specific image for a user
+        /// </summary>
+        /// <param name="userId">The user ID</param>
+        /// <param name="imageId">The image ID</param>
+        /// <returns>The image details</returns>
+        [HttpGet("{userId:int}/images/{imageId:int}", Name = "GetUserImageById")]
+        [EndpointSummary("Retrieves a specific image for a user")]
+        [EndpointDescription("Returns detailed information about a specific user image.")]
+        [EndpointName("GetUserImageById")]
+        [ProducesResponseType(typeof(UserImageResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<UserImageResponse> GetImageById(int userId, int imageId)
+        {
+            if (userId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid User ID",
+                    Detail = $"The provided user ID '{userId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (imageId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Image ID",
+                    Detail = $"The provided image ID '{imageId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!UserBL.DoesUserExist(userId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var image = UserImage.Find(imageId);
+
+            if (image == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Image Not Found",
+                    Detail = $"No image found with ID '{imageId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (image.UserID != userId)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Image Not Found",
+                    Detail = $"Image '{imageId}' does not belong to user '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return Ok(image.UserImageModel.ToResponse());
+        }
+
+        /// <summary>
+        /// Checks if an image exists for a user
+        /// </summary>
+        [HttpGet("{userId:int}/images/{imageId:int}/exists")]
+        [EndpointSummary("Checks if an image exists for a user")]
+        [EndpointDescription("Returns true if the image exists and belongs to the specified user.")]
+        [EndpointName("CheckUserImageExists")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> ImageExists(int userId, int imageId)
+        {
+            if (userId < 1 || imageId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = "Both user ID and image ID must be positive integers.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            var image = UserImage.Find(imageId);
+            bool exists = image != null && image.UserID == userId && !image.IsDeleted;
+
+            return Ok(exists);
+        }
+
+        #endregion
+
+        #region POST - User Images
+
+        /// <summary>
+        /// Uploads a new image for a user (via file upload)
+        /// </summary>
+        /// <param name="userId">The user ID</param>
+        /// <param name="file">The image file</param>
+        /// <returns>The created image record</returns>
+        [HttpPost("{userId:int}/images/upload")]
+        [Authorize]
+        [EndpointSummary("Uploads an image file for a user")]
+        [EndpointDescription("Uploads a new profile image file for the specified user. Users can only upload to their own profile unless Admin.")]
+        [EndpointName("UploadUserImage")]
+        [ProducesResponseType(typeof(ImageUploadResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<ImageUploadResponse>> UploadImage(int userId, IFormFile file)
+        {
+            if (userId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid User ID",
+                    Detail = $"The provided user ID '{userId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!User.IsOwnerOrAdmin(userId))
+            {
+                return Forbid();
+            }
+
+            if (!UserBL.DoesUserExist(userId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var uploadResult = await _imageUploadService.UploadUserImageAsync(file, userId);
+
+            if (!uploadResult.Success)
+            {
+                return BadRequest(new ImageUploadResponse
+                {
+                    Success = false,
+                    ErrorMessage = uploadResult.ErrorMessage
+                });
+            }
+
+            var userImage = new UserImage(new UserImageModel(
+                null,
+                userId,
+                uploadResult.FileUrl!,
+                DateTime.UtcNow,
+                false
+            ));
+
+            if (!userImage.Save())
+            {
+                _imageUploadService.DeleteImage(uploadResult.FileUrl!);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Save Failed",
+                    Detail = "Image uploaded but failed to save to database.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = new ImageUploadResponse
+            {
+                Success = true,
+                Image = userImage.UserImageModel.ToResponse(),
+                FileSizeBytes = uploadResult.FileSizeBytes
+            };
+
+            return CreatedAtRoute(
+                "GetUserImageById",
+                new { userId = userId, imageId = response.Image.UserImageID },
+                response);
+        }
+
+        /// <summary>
+        /// Uploads a new image for a user (via Base64)
+        /// </summary>
+        /// <param name="userId">The user ID</param>
+        /// <param name="request">The Base64 image data</param>
+        /// <returns>The created image record</returns>
+        [HttpPost("{userId:int}/images/upload-base64")]
+        [Authorize]
+        [EndpointSummary("Uploads an image via Base64 for a user")]
+        [EndpointDescription("Uploads a new profile image from Base64 encoded data. Users can only upload to their own profile unless Admin.")]
+        [EndpointName("UploadUserImageBase64")]
+        [ProducesResponseType(typeof(ImageUploadResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ImageUploadResponse>> UploadImageBase64(int userId, [FromBody] UploadUserImageBase64Request request)
+        {
+            if (userId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid User ID",
+                    Detail = $"The provided user ID '{userId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!User.IsOwnerOrAdmin(userId))
+            {
+                return Forbid();
+            }
+
+            if (!UserBL.DoesUserExist(userId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var uploadResult = await _imageUploadService.UploadUserImageFromBase64Async(request.ImageData, userId);
+
+            if (!uploadResult.Success)
+            {
+                return BadRequest(new ImageUploadResponse
+                {
+                    Success = false,
+                    ErrorMessage = uploadResult.ErrorMessage
+                });
+            }
+
+            var userImage = new UserImage(new UserImageModel(
+                null,
+                userId,
+                uploadResult.FileUrl!,
+                DateTime.UtcNow,
+                false
+            ));
+
+            if (!userImage.Save())
+            {
+                _imageUploadService.DeleteImage(uploadResult.FileUrl!);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Save Failed",
+                    Detail = "Image uploaded but failed to save to database.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = new ImageUploadResponse
+            {
+                Success = true,
+                Image = userImage.UserImageModel.ToResponse(),
+                FileSizeBytes = uploadResult.FileSizeBytes
+            };
+
+            return CreatedAtRoute(
+                "GetUserImageById",
+                new { userId = userId, imageId = response.Image.UserImageID },
+                response);
+        }
+
+        /// <summary>
+        /// Creates a user image record from an existing URL
+        /// </summary>
+        /// <param name="userId">The user ID</param>
+        /// <param name="request">The image URL</param>
+        /// <returns>The created image record</returns>
+        [HttpPost("{userId:int}/images")]
+        [Authorize]
+        [EndpointSummary("Creates a user image from URL")]
+        [EndpointDescription("Creates a new user image record from an existing image URL. Users can only add to their own profile unless Admin.")]
+        [EndpointName("CreateUserImage")]
+        [ProducesResponseType(typeof(UserImageResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<UserImageResponse> CreateImage(int userId, [FromBody] CreateUserImageRequest request)
+        {
+            if (userId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid User ID",
+                    Detail = $"The provided user ID '{userId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!User.IsOwnerOrAdmin(userId))
+            {
+                return Forbid();
+            }
+
+            if (!UserBL.DoesUserExist(userId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var userImage = new UserImage(new UserImageModel(
+                null,
+                userId,
+                request.ImageURL,
+                DateTime.UtcNow,
+                false
+            ));
+
+            if (!userImage.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Creation Failed",
+                    Detail = "An error occurred while creating the image record.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = userImage.UserImageModel.ToResponse();
+
+            return CreatedAtRoute(
+                "GetUserImageById",
+                new { userId = userId, imageId = response.UserImageID },
+                response);
+        }
+
+        #endregion
+
+        #region PUT - User Images
+
+        /// <summary>
+        /// Updates an existing user image (Owner or Admin only)
+        /// </summary>
+        [HttpPut("{userId:int}/images/{imageId:int}")]
+        [Authorize]
+        [EndpointSummary("Updates a user image")]
+        [EndpointDescription("Updates the details of an existing user image. Users can only update their own images unless Admin.")]
+        [EndpointName("UpdateUserImage")]
+        [ProducesResponseType(typeof(UserImageResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<UserImageResponse> UpdateImage(int userId, int imageId, [FromBody] UpdateUserImageRequest request)
+        {
+            if (userId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid User ID",
+                    Detail = $"The provided user ID '{userId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (imageId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Image ID",
+                    Detail = $"The provided image ID '{imageId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!User.IsOwnerOrAdmin(userId))
+            {
+                return Forbid();
+            }
+
+            if (!UserBL.DoesUserExist(userId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var image = UserImage.Find(imageId);
+
+            if (image == null || image.UserID != userId)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Image Not Found",
+                    Detail = $"Image '{imageId}' not found or does not belong to user '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            image.ImageURL = request.ImageURL;
+            image.IsDeleted = request.IsDeleted;
+
+            if (!image.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Update Failed",
+                    Detail = "An error occurred while updating the image.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            return Ok(image.UserImageModel.ToResponse());
+        }
+
+        #endregion
+
+        #region DELETE - User Images
+
+        /// <summary>
+        /// Deletes a user image (Owner or Admin only)
+        /// </summary>
+        [HttpDelete("{userId:int}/images/{imageId:int}")]
+        [Authorize]
+        [EndpointSummary("Deletes a user image")]
+        [EndpointDescription("Soft deletes an image from a user's profile. Users can only delete their own images unless Admin.")]
+        [EndpointName("DeleteUserImage")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public IActionResult DeleteImage(int userId, int imageId)
+        {
+            if (userId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid User ID",
+                    Detail = $"The provided user ID '{userId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (imageId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Image ID",
+                    Detail = $"The provided image ID '{imageId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!User.IsOwnerOrAdmin(userId))
+            {
+                return Forbid();
+            }
+
+            if (!UserBL.DoesUserExist(userId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "User Not Found",
+                    Detail = $"No user found with ID '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var image = UserImage.Find(imageId);
+
+            if (image == null || image.UserID != userId)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Image Not Found",
+                    Detail = $"Image '{imageId}' not found or does not belong to user '{userId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (!UserImage.DeleteUserImage(imageId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Delete Failed",
+                    Detail = $"Failed to delete image '{imageId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return NoContent();
+        }
+
+        #endregion
+
+        #endregion
+    }
+}

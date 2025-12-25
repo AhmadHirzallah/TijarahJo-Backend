@@ -12,7 +12,15 @@ namespace TijarahJoDB.BLL
 
 		public PostModel PostModel
 		{
-			get { return new PostModel(PostID = this.PostID, UserID = this.UserID, CategoryID = this.CategoryID, PostTitle = this.PostTitle, PostDescription = this.PostDescription, Price = this.Price, Status = this.Status, CreatedAt = this.CreatedAt, IsDeleted = this.IsDeleted); }
+			get { return new PostModel(PostID = this.PostID,
+                              UserID = this.UserID,
+                              CategoryID = this.CategoryID,
+                              PostTitle = this.PostTitle,
+                              PostDescription = this.PostDescription,
+                              Price = this.Price,
+                              Status = this.Status,
+                              CreatedAt = this.CreatedAt,
+                              IsDeleted = this.IsDeleted); }
 		}
 
 		public int? PostID { set; get; }
@@ -90,8 +98,8 @@ namespace TijarahJoDB.BLL
 		public static DataTable GetPaginated(
 			int PageNumber,
 			int RowsPerPage = 10,
-			bool IncludeDeleted = false
-		)
-			=> PostData.GetPaginated(PageNumber, RowsPerPage, IncludeDeleted);
+			bool IncludeDeleted = false,
+			int? CategoryID = null)
+			=> PostData.GetPaginated(PageNumber, RowsPerPage, IncludeDeleted, CategoryID);
 	}
 }

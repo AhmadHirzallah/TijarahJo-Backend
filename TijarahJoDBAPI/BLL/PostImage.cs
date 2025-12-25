@@ -78,5 +78,10 @@ namespace TijarahJoDB.BLL
 			=> PostImageData.DoesPostImageExist(PostImageID);
 		public static DataTable GetAllTbPostImages()
 			=> PostImageData.GetAllTbPostImages();
+		/// <summary>
+		/// Gets all images for a specific post
+		/// </summary>
+		public static DataTable GetImagesByPostId(int postId)
+			=> PostImageData.GetImagesByPostId(postId);
 	}
 }

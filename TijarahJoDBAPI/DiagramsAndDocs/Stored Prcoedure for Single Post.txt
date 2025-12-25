@@ -1,0 +1,67 @@
+USE [TijarahJoDB];
+GO
+
+CREATE OR ALTER PROCEDURE dbo.SP_GetPostDetails_All
+(
+    @PostID INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- 1) Post + Owner + Category + Role (ONE row)
+    SELECT
+        p.PostID,
+        p.UserID AS OwnerUserID,
+        u.Username AS OwnerUsername,
+        u.Email AS OwnerEmail,
+        u.FirstName AS OwnerFirstName,
+        u.LastName AS OwnerLastName,
+        CONCAT(u.FirstName, N' ', ISNULL(u.LastName, N'')) AS OwnerFullName,
+        u.RoleID,
+        ro.RoleName,
+
+        p.CategoryID,
+        c.CategoryName,
+
+        p.PostTitle,
+        p.PostDescription,
+        p.Price,
+        p.Status,
+        p.CreatedAt,
+        p.IsDeleted
+    FROM dbo.TbPosts p
+    JOIN dbo.TbUsers u ON u.UserID = p.UserID
+    JOIN dbo.TbRoles ro ON ro.RoleID = u.RoleID
+    JOIN dbo.TbItemCategories c ON c.CategoryID = p.CategoryID
+    WHERE p.PostID = @PostID AND p.IsDeleted = 0;
+
+    -- 2) Reviews (MANY rows)
+    SELECT
+        rv.ReviewID,
+        rv.PostID,
+        rv.UserID AS ReviewerUserID,
+        reviewer.Username AS ReviewerUsername,
+        reviewer.Email AS ReviewerEmail,
+        reviewer.FirstName AS ReviewerFirstName,
+        reviewer.LastName AS ReviewerLastName,
+        CONCAT(reviewer.FirstName, N' ', ISNULL(reviewer.LastName, N'')) AS ReviewerFullName,
+        rv.Rating,
+        rv.ReviewText,
+        rv.CreatedAt
+    FROM dbo.TbPostReviews rv
+    JOIN dbo.TbUsers reviewer ON reviewer.UserID = rv.UserID
+    WHERE rv.PostID = @PostID AND rv.IsDeleted = 0
+    ORDER BY rv.CreatedAt DESC, rv.ReviewID DESC;
+
+    -- 3) Images (MANY rows)
+    SELECT
+        i.PostImageID,
+        i.PostID,
+        i.PostImageURL,
+        i.UploadedAt
+    FROM dbo.TbPostImages i
+    WHERE i.PostID = @PostID AND i.IsDeleted = 0
+    ORDER BY i.UploadedAt ASC, i.PostImageID ASC;
+END;
+GO
