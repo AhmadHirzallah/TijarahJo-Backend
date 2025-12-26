@@ -1,0 +1,6 @@
+@TijarahJoDBAPI_HostAddress = http://localhost:5033
+
+GET {{TijarahJoDBAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

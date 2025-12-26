@@ -1,0 +1,152 @@
+using System;
+using System.Data;
+using TijarahJoDB.DAL;
+using Models;
+
+namespace TijarahJoDB.BLL
+{
+	public class UserBL
+	{
+		public enum enMode { AddNew = 0, Update = 1 };
+		public enMode Mode = enMode.AddNew;
+
+		public UserModel UserModel => new UserModel(
+			UserID, Username, HashedPassword, Email, FirstName, LastName, 
+			JoinDate, Status, RoleID, IsDeleted, PrimaryPhone);
+
+		public int? UserID { get; set; }
+		public string Username { get; set; }
+		public string HashedPassword { get; set; }
+		public string Email { get; set; }
+		public string FirstName { get; set; }
+		public string? LastName { get; set; }
+		public DateTime JoinDate { get; set; }
+		public int Status { get; set; }
+		public int RoleID { get; set; }
+		public bool IsDeleted { get; set; }
+		public string? PrimaryPhone { get; set; }
+
+		public UserBL(UserModel userModel, enMode cMode = enMode.AddNew)
+		{
+			UserID = userModel.UserID;
+			Username = userModel.Username;
+			HashedPassword = userModel.HashedPassword;
+			Email = userModel.Email;
+			FirstName = userModel.FirstName;
+			LastName = userModel.LastName;
+			JoinDate = userModel.JoinDate;
+			Status = userModel.Status;
+			RoleID = userModel.RoleID;
+			IsDeleted = userModel.IsDeleted;
+			PrimaryPhone = userModel.PrimaryPhone;
+			Mode = cMode;
+		}
+
+        /// <summary>
+        /// Finds a user by username or email for login
+        /// </summary>
+        public static UserBL? FindByLogin(string login)
+        {
+            UserModel? userModel = UserData.GetUserByLogin(login);
+
+            if (userModel != null)
+                return new UserBL(userModel, enMode.Update);
+
+            return null;
+        }
+
+        /// <summary>
+        /// Legacy login method - kept for backward compatibility
+        /// </summary>
+        [Obsolete("Use FindByLogin and verify password with SecurityService instead")]
+        public static UserBL Login(string login, string hashedPassword)
+        {
+            UserModel userModel = UserData.GetUserByLoginAndPassword(login, hashedPassword);
+
+            if (userModel != null)
+                return new UserBL(userModel, enMode.Update);
+
+            return null;
+        }
+
+		private bool _AddNewUser()
+		{
+			UserID = UserData.AddUser(UserModel);
+			return (UserID != -1);
+		}
+
+		/// <summary>
+		/// Adds a new user with a primary phone number
+		/// </summary>
+		private bool _AddNewUserWithPhone(string? phoneNumber)
+		{
+			UserID = UserData.AddUserWithPhone(UserModel, phoneNumber);
+			return (UserID != -1);
+		}
+
+		private bool _UpdateUser()
+		{
+			return UserData.UpdateUser(UserModel);
+		}
+
+		public static UserBL Find(int? UserID)
+		{
+			UserModel userModel = UserData.GetUserByID(UserID);
+
+			if (userModel != null)
+				return new UserBL(userModel, enMode.Update);
+			else
+				return null;
+		}
+
+		public bool Save()
+		{
+			switch (Mode)
+			{
+				case enMode.AddNew:
+					if (_AddNewUser())
+					{
+						Mode = enMode.Update;
+						return true;
+					}
+					return false;
+
+				case enMode.Update:
+					return _UpdateUser();
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Saves user with a phone number (creates both user and phone record)
+		/// </summary>
+		public bool SaveWithPhone(string? phoneNumber)
+		{
+			switch (Mode)
+			{
+				case enMode.AddNew:
+					if (_AddNewUserWithPhone(phoneNumber))
+					{
+						Mode = enMode.Update;
+						PrimaryPhone = phoneNumber;
+						return true;
+					}
+					return false;
+
+				case enMode.Update:
+					// For updates, save user first then handle phone separately
+					return _UpdateUser();
+			}
+			return false;
+		}
+
+		public static bool DeleteUser(int? UserID)
+			=> UserData.DeleteUser(UserID);
+			
+		public static bool DoesUserExist(int? UserID)
+			=> UserData.DoesUserExist(UserID);
+			
+		public static DataTable GetAllTbUsers()
+			=> UserData.GetAllTbUsers();
+	}
+}

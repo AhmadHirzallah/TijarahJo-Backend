@@ -1,0 +1,29 @@
+using Models;
+using TijarahJoDBAPI.DTOs.Responses;
+
+namespace TijarahJoDBAPI.DTOs.Mappers;
+
+public static class UserMapper
+{
+    public static UserResponse ToResponse(this UserModel model)
+    {
+        return new UserResponse
+        {
+            UserID = model.UserID,
+            Username = model.Username,
+            Email = model.Email,
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            JoinDate = model.JoinDate,
+            Status = model.Status,
+            RoleID = model.RoleID,
+            IsDeleted = model.IsDeleted,
+            PrimaryPhone = model.PrimaryPhone
+        };
+    }
+
+    public static List<UserResponse> ToResponseList(this IEnumerable<UserModel> models)
+    {
+        return models.Select(m => m.ToResponse()).ToList();
+    }
+}

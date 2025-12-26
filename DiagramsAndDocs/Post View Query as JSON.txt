@@ -1,0 +1,87 @@
+USE [TijarahJoDB];
+GO
+
+select * from VW_PostDetails_Json;
+
+CREATE OR ALTER VIEW dbo.VW_PostDetails_Json
+AS
+SELECT
+    -- Post core
+    p.PostID,
+    p.UserID                 AS OwnerUserID,
+    p.CategoryID,
+    c.CategoryName,
+    p.PostTitle,
+    p.PostDescription,
+    p.Price,
+    p.Status                 AS PostStatus,
+    p.CreatedAt              AS PostCreatedAt,
+    p.IsDeleted              AS PostIsDeleted,
+
+    -- Owner (seller)
+    u.Username               AS OwnerUsername,
+    u.Email                  AS OwnerEmail,
+    u.FirstName              AS OwnerFirstName,
+    u.LastName               AS OwnerLastName,
+    CONCAT(u.FirstName, N' ', ISNULL(u.LastName, N'')) AS OwnerFullName,
+    u.Status                 AS OwnerStatus,
+    u.RoleID,
+    r.RoleName,
+
+    -- Images as JSON array
+    ImagesJson =
+    (
+        SELECT
+            i.PostImageID,
+            i.PostImageURL,
+            i.UploadedAt
+        FROM dbo.TbPostImages i
+        WHERE i.PostID = p.PostID
+          AND i.IsDeleted = 0
+        ORDER BY i.UploadedAt ASC, i.PostImageID ASC
+        FOR JSON PATH
+    ),
+
+    -- Reviews as JSON array (each review includes reviewer info)
+    ReviewsJson =
+    (
+        SELECT
+            rv.ReviewID,
+            rv.PostID,
+            rv.UserID AS ReviewerUserID,
+            reviewer.Username AS ReviewerUsername,
+            reviewer.Email    AS ReviewerEmail,
+            reviewer.FirstName AS ReviewerFirstName,
+            reviewer.LastName  AS ReviewerLastName,
+            CONCAT(reviewer.FirstName, N' ', ISNULL(reviewer.LastName, N'')) AS ReviewerFullName,
+            rv.Rating,
+            rv.ReviewText,
+            rv.CreatedAt AS ReviewCreatedAt
+        FROM dbo.TbPostReviews rv
+        JOIN dbo.TbUsers reviewer ON reviewer.UserID = rv.UserID
+        WHERE rv.PostID = p.PostID
+          AND rv.IsDeleted = 0
+        ORDER BY rv.CreatedAt DESC, rv.ReviewID DESC
+        FOR JSON PATH
+    ),
+
+    -- Review summary (useful for UI)
+    ReviewCount =
+    (
+        SELECT COUNT(*)
+        FROM dbo.TbPostReviews rv
+        WHERE rv.PostID = p.PostID AND rv.IsDeleted = 0
+    ),
+    AvgRating =
+    (
+        SELECT CAST(AVG(CAST(rv.Rating AS decimal(9,2))) AS decimal(9,2))
+        FROM dbo.TbPostReviews rv
+        WHERE rv.PostID = p.PostID AND rv.IsDeleted = 0
+    )
+
+FROM dbo.TbPosts p
+JOIN dbo.TbItemCategories c ON c.CategoryID = p.CategoryID
+JOIN dbo.TbUsers u          ON u.UserID = p.UserID
+JOIN dbo.TbRoles r          ON r.RoleID = u.RoleID
+WHERE p.IsDeleted = 0;
+GO
