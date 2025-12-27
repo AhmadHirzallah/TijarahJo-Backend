@@ -55,29 +55,37 @@ namespace TijarahJoDB.DAL
 
 		public static int AddPost(PostModel PostModel)
 		{
-			using (var connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-			using (var command = new SqlCommand("SP_AddPost", connection))
+			try
 			{
-				command.CommandType = CommandType.StoredProcedure;
-
-				command.Parameters.AddWithValue("@UserID", PostModel.UserID);
-				command.Parameters.AddWithValue("@CategoryID", PostModel.CategoryID);
-				command.Parameters.AddWithValue("@PostTitle", PostModel.PostTitle);
-				command.Parameters.AddWithValue("@PostDescription", (object)PostModel.PostDescription ?? DBNull.Value);
-				command.Parameters.AddWithValue("@Price", (object)PostModel.Price ?? DBNull.Value);
-				command.Parameters.AddWithValue("@Status", PostModel.Status);
-				command.Parameters.AddWithValue("@CreatedAt", PostModel.CreatedAt);
-				command.Parameters.AddWithValue("@IsDeleted", PostModel.IsDeleted);
-				var outputIdParam = new SqlParameter("@NewPostID", SqlDbType.Int)
+				using (var connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+				using (var command = new SqlCommand("SP_AddPost", connection))
 				{
-					Direction = ParameterDirection.Output
-				};
-				command.Parameters.Add(outputIdParam);
+					command.CommandType = CommandType.StoredProcedure;
 
-				connection.Open();
-				command.ExecuteNonQuery();
+					command.Parameters.AddWithValue("@UserID", PostModel.UserID);
+					command.Parameters.AddWithValue("@CategoryID", PostModel.CategoryID);
+					command.Parameters.AddWithValue("@PostTitle", PostModel.PostTitle);
+					command.Parameters.AddWithValue("@PostDescription", (object?)PostModel.PostDescription ?? DBNull.Value);
+					command.Parameters.AddWithValue("@Price", (object?)PostModel.Price ?? DBNull.Value);
+					command.Parameters.AddWithValue("@Status", PostModel.Status);
+					command.Parameters.AddWithValue("@CreatedAt", PostModel.CreatedAt);
+					command.Parameters.AddWithValue("@IsDeleted", PostModel.IsDeleted);
+					var outputIdParam = new SqlParameter("@NewPostID", SqlDbType.Int)
+					{
+						Direction = ParameterDirection.Output
+					};
+					command.Parameters.Add(outputIdParam);
 
-				return (int)outputIdParam.Value;
+					connection.Open();
+					command.ExecuteNonQuery();
+
+					return (int)outputIdParam.Value;
+				}
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine($"AddPost Error: {ex.Message}");
+				return -1;
 			}
 		}
 
@@ -260,6 +268,120 @@ namespace TijarahJoDB.DAL
 			return dt;
 		}
 
-	}
+		/// <summary>
+		/// Gets all posts for a specific user
+		/// </summary>
+		/// <param name="userId">The user ID</param>
+		/// <param name="includeDeleted">Include soft-deleted posts</param>
+		/// <returns>DataTable with user's posts</returns>
+		public static DataTable GetPostsByUserId(int userId, bool includeDeleted = false)
+		{
+			DataTable dt = new DataTable();
 
+			try
+			{
+				using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+				using (SqlCommand command = new SqlCommand(@"
+					SELECT 
+						p.PostID,
+						p.UserID,
+						p.CategoryID,
+						p.PostTitle,
+						p.PostDescription,
+						p.Price,
+						p.Status,
+						p.CreatedAt,
+						p.IsDeleted,
+						c.CategoryName,
+						(SELECT TOP 1 PostImageURL FROM TbPostImages WHERE PostID = p.PostID AND IsDeleted = 0 ORDER BY UploadedAt) AS PrimaryImageUrl
+					FROM TbPosts p
+					LEFT JOIN TbItemCategories c ON p.CategoryID = c.CategoryID
+					WHERE p.UserID = @UserID
+						AND (@IncludeDeleted = 1 OR p.IsDeleted = 0)
+					ORDER BY p.CreatedAt DESC", connection))
+				{
+					command.CommandType = CommandType.Text;
+					command.Parameters.Add("@UserID", SqlDbType.Int).Value = userId;
+					command.Parameters.Add("@IncludeDeleted", SqlDbType.Bit).Value = includeDeleted;
+
+					connection.Open();
+
+					using (SqlDataReader reader = command.ExecuteReader())
+					{
+						if (reader.HasRows)
+							dt.Load(reader);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine($"GetPostsByUserId Error: {ex.Message}");
+			}
+
+			return dt;
+		}
+
+		/// <summary>
+		/// Gets paginated posts for a specific user
+		/// </summary>
+		public static DataTable GetPostsByUserIdPaginated(
+			int userId,
+			int pageNumber = 1,
+			int rowsPerPage = 10,
+			bool includeDeleted = false)
+		{
+			DataTable dt = new DataTable();
+
+			try
+			{
+				using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+				using (SqlCommand command = new SqlCommand(@"
+					;WITH PostsCTE AS (
+						SELECT 
+							p.PostID,
+							p.UserID,
+							p.CategoryID,
+							p.PostTitle,
+							p.PostDescription,
+							p.Price,
+							p.Status,
+							p.CreatedAt,
+							p.IsDeleted,
+							c.CategoryName,
+							(SELECT TOP 1 PostImageURL FROM TbPostImages WHERE PostID = p.PostID AND IsDeleted = 0 ORDER BY UploadedAt) AS PrimaryImageUrl,
+							COUNT(*) OVER() AS TotalRows
+						FROM TbPosts p
+						LEFT JOIN TbItemCategories c ON p.CategoryID = c.CategoryID
+						WHERE p.UserID = @UserID
+							AND (@IncludeDeleted = 1 OR p.IsDeleted = 0)
+					)
+					SELECT *
+					FROM PostsCTE
+					ORDER BY CreatedAt DESC
+					OFFSET (@PageNumber - 1) * @RowsPerPage ROWS
+					FETCH NEXT @RowsPerPage ROWS ONLY", connection))
+				{
+					command.CommandType = CommandType.Text;
+					command.Parameters.Add("@UserID", SqlDbType.Int).Value = userId;
+					command.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+					command.Parameters.Add("@RowsPerPage", SqlDbType.Int).Value = rowsPerPage;
+					command.Parameters.Add("@IncludeDeleted", SqlDbType.Bit).Value = includeDeleted;
+
+					connection.Open();
+
+					using (SqlDataReader reader = command.ExecuteReader())
+					{
+						if (reader.HasRows)
+							dt.Load(reader);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine($"GetPostsByUserIdPaginated Error: {ex.Message}");
+			}
+
+			return dt;
+		}
+	}
 }

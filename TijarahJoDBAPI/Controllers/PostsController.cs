@@ -12,10 +12,6 @@ namespace TijarahJoDBAPI.Controllers
 {
     /// <summary>
     /// Comprehensive controller for marketplace posts and their related resources.
-    /// This is a composite controller that manages:
-    /// - Posts (CRUD operations)
-    /// - Post Images (nested under /api/posts/{postId}/images)
-    /// - Post Reviews (nested under /api/posts/{postId}/reviews)
     /// </summary>
     [ApiController]
     [Route("api/posts")]
@@ -39,8 +35,6 @@ namespace TijarahJoDBAPI.Controllers
         /// <returns>A list of all marketplace posts</returns>
         [HttpGet]
         [EndpointSummary("Retrieves all posts")]
-        [EndpointDescription("Returns a list of all posts/listings in the marketplace.")]
-        [EndpointName("GetAllPosts")]
         [ProducesResponseType(typeof(IEnumerable<PostResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public ActionResult<IEnumerable<PostResponse>> GetAll()
@@ -79,6 +73,88 @@ namespace TijarahJoDBAPI.Controllers
         }
 
         /// <summary>
+        /// Gets the current authenticated user's posts (My Listings)
+        /// </summary>
+        [HttpGet("my")]
+        [Authorize]
+        [EndpointSummary("Gets current user's posts")]
+        [EndpointDescription("Returns paginated posts for the currently authenticated user with images.")]
+        [ProducesResponseType(typeof(UserPostsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult<UserPostsResponse> GetMyPosts(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int rowsPerPage = 50,
+            [FromQuery] bool includeDeleted = false)
+        {
+            var userId = User.GetUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            return GetUserPostsInternal(userId.Value, pageNumber, rowsPerPage, includeDeleted);
+        }
+
+        /// <summary>
+        /// Gets posts by a specific user ID
+        /// </summary>
+        [HttpGet("user/{userId:int}")]
+        [EndpointSummary("Gets posts by user ID")]
+        [EndpointDescription("Returns paginated posts for the specified user with images.")]
+        [ProducesResponseType(typeof(UserPostsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public ActionResult<UserPostsResponse> GetPostsByUser(
+            int userId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int rowsPerPage = 50,
+            [FromQuery] bool includeDeleted = false)
+        {
+            if (userId < 1)
+                return BadRequest(new ProblemDetails { Title = "Invalid User ID", Status = 400 });
+
+            // Only admins can see deleted posts for other users
+            if (includeDeleted && !User.IsAdmin())
+            {
+                var currentUserId = User.GetUserId();
+                if (currentUserId != userId)
+                    includeDeleted = false;
+            }
+
+            return GetUserPostsInternal(userId, pageNumber, rowsPerPage, includeDeleted);
+        }
+
+        /// <summary>
+        /// Internal helper to get user posts with pagination
+        /// </summary>
+        private ActionResult<UserPostsResponse> GetUserPostsInternal(
+            int userId, int pageNumber, int rowsPerPage, bool includeDeleted)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (rowsPerPage < 1) rowsPerPage = 10;
+            if (rowsPerPage > 100) rowsPerPage = 100;
+
+            var postsTable = Post.GetPostsByUserIdPaginated(userId, pageNumber, rowsPerPage, includeDeleted);
+            var posts = MapToUserPostResponsesWithImages(postsTable);
+
+            int totalCount = 0;
+            if (postsTable.Rows.Count > 0 && postsTable.Columns.Contains("TotalRows"))
+                totalCount = Convert.ToInt32(postsTable.Rows[0]["TotalRows"]);
+            else
+                totalCount = posts.Count;
+
+            int totalPages = rowsPerPage > 0 ? (int)Math.Ceiling((double)totalCount / rowsPerPage) : 1;
+
+            return Ok(new UserPostsResponse
+            {
+                Items = posts,
+                PageNumber = pageNumber,
+                RowsPerPage = rowsPerPage,
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                HasPreviousPage = pageNumber > 1,
+                HasNextPage = pageNumber < totalPages
+            });
+        }
+
+        /// <summary>
         /// Retrieves paginated posts with optional category filtering
         /// </summary>
         /// <param name="request">Pagination and filtering parameters</param>
@@ -94,7 +170,6 @@ namespace TijarahJoDBAPI.Controllers
         [HttpGet("paginated")]
         [EndpointSummary("Retrieves paginated posts")]
         [EndpointDescription("Returns a paginated list of posts with enriched user and category data. Supports optional category filtering.")]
-        [EndpointName("GetPaginatedPosts")]
         [ProducesResponseType(typeof(PaginatedResponse<PostListingResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public ActionResult<PaginatedResponse<PostListingResponse>> GetPaginated([FromQuery] GetPaginatedRequest request)
@@ -118,7 +193,7 @@ namespace TijarahJoDBAPI.Controllers
                     Detail = request.CategoryID.HasValue
                         ? $"No posts found for category ID '{request.CategoryID}' on page {request.PageNumber}."
                         : $"No posts found on page {request.PageNumber}.",
-                    Status = StatusCodes.Status404NotFound
+                    Status = 404
                 });
             }
 
@@ -139,16 +214,13 @@ namespace TijarahJoDBAPI.Controllers
         }
 
         /// <summary>
-        /// Retrieves a post by ID (basic info)
+        /// Retrieves a post by ID
         /// </summary>
         /// <param name="id">The post ID</param>
         /// <returns>The post details</returns>
         [HttpGet("{id:int}", Name = "GetPostById")]
         [EndpointSummary("Retrieves a post by ID")]
-        [EndpointDescription("Returns basic information about a specific marketplace post/listing.")]
-        [EndpointName("GetPostById")]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public ActionResult<PostResponse> GetById(int id)
         {
@@ -197,10 +269,7 @@ namespace TijarahJoDBAPI.Controllers
         /// </remarks>
         [HttpGet("{id:int}/details", Name = "GetPostDetails")]
         [EndpointSummary("Retrieves complete post details")]
-        [EndpointDescription("Returns comprehensive post information including owner, category, reviews, and images.")]
-        [EndpointName("GetPostDetails")]
         [ProducesResponseType(typeof(PostDetailsResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public ActionResult<PostDetailsResponse> GetDetails(int id)
         {
@@ -238,10 +307,7 @@ namespace TijarahJoDBAPI.Controllers
         /// <returns>Boolean indicating existence</returns>
         [HttpGet("{id:int}/exists")]
         [EndpointSummary("Checks if a post exists")]
-        [EndpointDescription("Returns true if a post with the specified ID exists, false otherwise.")]
-        [EndpointName("CheckPostExists")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public ActionResult<bool> Exists(int id)
         {
             if (id < 1)
@@ -270,7 +336,6 @@ namespace TijarahJoDBAPI.Controllers
         [Authorize]
         [EndpointSummary("Creates a new post")]
         [EndpointDescription("Creates a new marketplace listing/post. Requires authentication.")]
-        [EndpointName("CreatePost")]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -282,6 +347,17 @@ namespace TijarahJoDBAPI.Controllers
                 return BadRequest(ModelState);
             }
 
+            // Validate CategoryID exists
+            if (!Category.DoesCategoryExist(request.CategoryID))
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Category",
+                    Detail = $"Category with ID '{request.CategoryID}' does not exist.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
             // Use authenticated user's ID if not admin, or allow admin to create for any user
             var currentUserId = User.GetUserId();
             var postUserId = request.UserID;
@@ -290,6 +366,17 @@ namespace TijarahJoDBAPI.Controllers
             if (!User.IsAdmin() && postUserId != currentUserId)
             {
                 postUserId = currentUserId ?? request.UserID;
+            }
+
+            // Validate the UserID exists
+            if (!UserBL.DoesUserExist(postUserId))
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid User",
+                    Detail = $"User with ID '{postUserId}' does not exist.",
+                    Status = StatusCodes.Status400BadRequest
+                });
             }
 
             Post post = new Post(new PostModel
@@ -310,7 +397,7 @@ namespace TijarahJoDBAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
                 {
                     Title = "Creation Failed",
-                    Detail = "An error occurred while creating the post.",
+                    Detail = "An error occurred while creating the post. Please check that all fields are valid.",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
@@ -334,7 +421,6 @@ namespace TijarahJoDBAPI.Controllers
         [Authorize]
         [EndpointSummary("Updates an existing post")]
         [EndpointDescription("Updates the details of an existing marketplace listing/post. Users can only update their own posts unless Admin.")]
-        [EndpointName("UpdatePost")]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -421,7 +507,6 @@ namespace TijarahJoDBAPI.Controllers
         [Authorize]
         [EndpointSummary("Deletes a post")]
         [EndpointDescription("Soft deletes a marketplace listing/post. Users can only delete their own posts unless Admin.")]
-        [EndpointName("DeletePost")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -1177,10 +1262,7 @@ namespace TijarahJoDBAPI.Controllers
         /// </summary>
         [HttpGet("{postId:int}/reviews/{reviewId:int}/exists")]
         [EndpointSummary("Checks if a review exists for a post")]
-        [EndpointDescription("Returns true if the review exists and belongs to the specified post.")]
-        [EndpointName("CheckPostReviewExists")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public ActionResult<bool> ReviewExists(int postId, int reviewId)
         {
             if (postId < 1 || reviewId < 1)
@@ -1435,6 +1517,55 @@ namespace TijarahJoDBAPI.Controllers
         }
 
         #endregion
+
+        #endregion
+
+        #region Helper Methods
+
+        private static List<UserPostResponse> MapToUserPostResponsesWithImages(System.Data.DataTable dt)
+        {
+            var posts = new List<UserPostResponse>();
+            foreach (System.Data.DataRow row in dt.Rows)
+            {
+                var postId = (int)row["PostID"];
+                
+                // Get images for this post
+                var imagesTable = PostImage.GetImagesByPostId(postId);
+                var images = new List<PostImageDetailResponse>();
+                foreach (System.Data.DataRow imgRow in imagesTable.Rows)
+                {
+                    images.Add(new PostImageDetailResponse
+                    {
+                        PostImageID = (int)imgRow["PostImageID"],
+                        PostID = (int)imgRow["PostID"],
+                        PostImageURL = (string)imgRow["PostImageURL"],
+                        UploadedAt = (DateTime)imgRow["UploadedAt"]
+                    });
+                }
+
+                var primaryImageUrl = row.Table.Columns.Contains("PrimaryImageUrl") && row["PrimaryImageUrl"] != DBNull.Value
+                    ? (string)row["PrimaryImageUrl"]
+                    : images.FirstOrDefault()?.PostImageURL;
+
+                posts.Add(new UserPostResponse
+                {
+                    PostID = postId,
+                    UserID = (int)row["UserID"],
+                    CategoryID = (int)row["CategoryID"],
+                    CategoryName = row.Table.Columns.Contains("CategoryName") && row["CategoryName"] != DBNull.Value
+                        ? (string)row["CategoryName"] : null,
+                    PostTitle = (string)row["PostTitle"],
+                    PostDescription = row["PostDescription"] == DBNull.Value ? null : (string)row["PostDescription"],
+                    Price = row["Price"] == DBNull.Value ? 0m : Convert.ToDecimal(row["Price"]),
+                    Status = (int)row["Status"],
+                    CreatedAt = (DateTime)row["CreatedAt"],
+                    IsDeleted = (bool)row["IsDeleted"],
+                    PrimaryImageUrl = primaryImageUrl,
+                    Images = images
+                });
+            }
+            return posts;
+        }
 
         #endregion
     }

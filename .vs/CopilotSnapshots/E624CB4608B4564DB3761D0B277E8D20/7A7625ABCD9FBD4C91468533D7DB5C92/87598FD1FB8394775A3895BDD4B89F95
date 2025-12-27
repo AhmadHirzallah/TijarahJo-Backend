@@ -1,0 +1,52 @@
+﻿namespace TijarahJoDBAPI.DTOs.Responses;
+
+/// <summary>
+/// Response DTO for a user's post - aligned with frontend PostDetails type
+/// </summary>
+public class UserPostResponse
+{
+    // Post Info
+    public int PostID { get; set; }
+    public int UserID { get; set; }
+    public int CategoryID { get; set; }
+    public string? CategoryName { get; set; }
+    public string PostTitle { get; set; } = string.Empty;
+    public string? PostDescription { get; set; }
+    public decimal Price { get; set; }
+    public int Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public bool IsDeleted { get; set; }
+
+    // Images - aligned with frontend
+    public List<PostImageDetailResponse> Images { get; set; } = new();
+    public string? PrimaryImageUrl { get; set; }
+    public int ImageCount => Images.Count;
+
+    /// <summary>
+    /// Status name for display
+    /// </summary>
+    public string StatusName => Status switch
+    {
+        0 => "Draft",
+        1 => "Pending",
+        2 => "Active",
+        3 => "Sold",
+        4 => "Expired",
+        5 => "Rejected",
+        _ => "Unknown"
+    };
+}
+
+/// <summary>
+/// Paginated response for user's posts - matches frontend expected format
+/// </summary>
+public class UserPostsResponse
+{
+    public List<UserPostResponse> Items { get; set; } = new();
+    public int PageNumber { get; set; } = 1;
+    public int RowsPerPage { get; set; } = 10;
+    public int TotalCount { get; set; }
+    public int TotalPages { get; set; }
+    public bool HasPreviousPage { get; set; }
+    public bool HasNextPage { get; set; }
+}

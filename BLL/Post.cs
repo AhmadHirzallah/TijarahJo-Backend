@@ -101,5 +101,21 @@ namespace TijarahJoDB.BLL
 			bool IncludeDeleted = false,
 			int? CategoryID = null)
 			=> PostData.GetPaginated(PageNumber, RowsPerPage, IncludeDeleted, CategoryID);
+
+		/// <summary>
+		/// Gets all posts for a specific user
+		/// </summary>
+		public static DataTable GetPostsByUserId(int userId, bool includeDeleted = false)
+			=> PostData.GetPostsByUserId(userId, includeDeleted);
+
+		/// <summary>
+		/// Gets paginated posts for a specific user
+		/// </summary>
+		public static DataTable GetPostsByUserIdPaginated(
+			int userId,
+			int pageNumber = 1,
+			int rowsPerPage = 10,
+			bool includeDeleted = false)
+			=> PostData.GetPostsByUserIdPaginated(userId, pageNumber, rowsPerPage, includeDeleted);
 	}
 }
