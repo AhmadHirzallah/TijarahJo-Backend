@@ -1,0 +1,1572 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Models;
+using TijarahJoDB.BLL;
+using TijarahJoDBAPI.DTOs.Requests;
+using TijarahJoDBAPI.DTOs.Responses;
+using TijarahJoDBAPI.DTOs.Mappers;
+using TijarahJoDBAPI.Extensions;
+using TijarahJoDBAPI.Services;
+
+namespace TijarahJoDBAPI.Controllers
+{
+    /// <summary>
+    /// Comprehensive controller for marketplace posts and their related resources.
+    /// </summary>
+    [ApiController]
+    [Route("api/posts")]
+    [Produces("application/json")]
+    public class PostsController : ControllerBase
+    {
+        private readonly ImageUploadService _imageUploadService;
+
+        public PostsController(ImageUploadService imageUploadService)
+        {
+            _imageUploadService = imageUploadService;
+        }
+
+        #region ==================== POST CRUD OPERATIONS ====================
+
+        #region GET - Posts
+
+        /// <summary>
+        /// Retrieves all posts
+        /// </summary>
+        /// <returns>A list of all marketplace posts</returns>
+        [HttpGet]
+        [EndpointSummary("Retrieves all posts")]
+        [ProducesResponseType(typeof(IEnumerable<PostResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<IEnumerable<PostResponse>> GetAll()
+        {
+            var postsList = Post.GetAllTbUserPosts();
+
+            if (postsList == null || postsList.Rows.Count == 0)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "No Posts Found",
+                    Detail = "There are no posts available in the marketplace.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var responseList = new List<PostResponse>();
+
+            foreach (System.Data.DataRow row in postsList.Rows)
+            {
+                responseList.Add(new PostResponse
+                {
+                    PostID = (int?)row["PostID"],
+                    UserID = (int)row["UserID"],
+                    CategoryID = (int)row["CategoryID"],
+                    PostTitle = (string)row["PostTitle"],
+                    PostDescription = row["PostDescription"] == DBNull.Value ? null : (string)row["PostDescription"],
+                    Price = row["Price"] == DBNull.Value ? null : (decimal?)row["Price"],
+                    Status = (int)row["Status"],
+                    CreatedAt = (DateTime)row["CreatedAt"],
+                    IsDeleted = (bool)row["IsDeleted"]
+                });
+            }
+
+            return Ok(responseList);
+        }
+
+        /// <summary>
+        /// Gets the current authenticated user's posts (My Listings)
+        /// </summary>
+        [HttpGet("my")]
+        [Authorize]
+        [EndpointSummary("Gets current user's posts")]
+        [EndpointDescription("Returns paginated posts for the currently authenticated user with images.")]
+        [ProducesResponseType(typeof(UserPostsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult<UserPostsResponse> GetMyPosts(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int rowsPerPage = 50,
+            [FromQuery] bool includeDeleted = false)
+        {
+            var userId = User.GetUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            return GetUserPostsInternal(userId.Value, pageNumber, rowsPerPage, includeDeleted);
+        }
+
+        /// <summary>
+        /// Gets posts by a specific user ID
+        /// </summary>
+        [HttpGet("user/{userId:int}")]
+        [EndpointSummary("Gets posts by user ID")]
+        [EndpointDescription("Returns paginated posts for the specified user with images.")]
+        [ProducesResponseType(typeof(UserPostsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public ActionResult<UserPostsResponse> GetPostsByUser(
+            int userId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int rowsPerPage = 50,
+            [FromQuery] bool includeDeleted = false)
+        {
+            if (userId < 1)
+                return BadRequest(new ProblemDetails { Title = "Invalid User ID", Status = 400 });
+
+            // Only admins can see deleted posts for other users
+            if (includeDeleted && !User.IsAdmin())
+            {
+                var currentUserId = User.GetUserId();
+                if (currentUserId != userId)
+                    includeDeleted = false;
+            }
+
+            return GetUserPostsInternal(userId, pageNumber, rowsPerPage, includeDeleted);
+        }
+
+        /// <summary>
+        /// Internal helper to get user posts with pagination
+        /// </summary>
+        private ActionResult<UserPostsResponse> GetUserPostsInternal(
+            int userId, int pageNumber, int rowsPerPage, bool includeDeleted)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (rowsPerPage < 1) rowsPerPage = 10;
+            if (rowsPerPage > 100) rowsPerPage = 100;
+
+            var postsTable = Post.GetPostsByUserIdPaginated(userId, pageNumber, rowsPerPage, includeDeleted);
+            var posts = MapToUserPostResponsesWithImages(postsTable);
+
+            int totalCount = 0;
+            if (postsTable.Rows.Count > 0 && postsTable.Columns.Contains("TotalRows"))
+                totalCount = Convert.ToInt32(postsTable.Rows[0]["TotalRows"]);
+            else
+                totalCount = posts.Count;
+
+            int totalPages = rowsPerPage > 0 ? (int)Math.Ceiling((double)totalCount / rowsPerPage) : 1;
+
+            return Ok(new UserPostsResponse
+            {
+                Items = posts,
+                PageNumber = pageNumber,
+                RowsPerPage = rowsPerPage,
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                HasPreviousPage = pageNumber > 1,
+                HasNextPage = pageNumber < totalPages
+            });
+        }
+
+        /// <summary>
+        /// Retrieves paginated posts with optional category filtering
+        /// </summary>
+        /// <param name="request">Pagination and filtering parameters</param>
+        /// <returns>A paginated list of posts with enriched user and category data</returns>
+        /// <remarks>
+        /// Sample requests:
+        /// 
+        ///     GET /api/posts/paginated?pageNumber=1&amp;rowsPerPage=10
+        ///     GET /api/posts/paginated?pageNumber=1&amp;rowsPerPage=10&amp;categoryID=5
+        ///     GET /api/posts/paginated?pageNumber=2&amp;rowsPerPage=20&amp;includeDeleted=true
+        /// 
+        /// </remarks>
+        [HttpGet("paginated")]
+        [EndpointSummary("Retrieves paginated posts")]
+        [EndpointDescription("Returns a paginated list of posts with enriched user and category data. Supports optional category filtering.")]
+        [ProducesResponseType(typeof(PaginatedResponse<PostListingResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<PaginatedResponse<PostListingResponse>> GetPaginated([FromQuery] GetPaginatedRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var postsTable = Post.GetPaginated(
+                request.PageNumber,
+                request.RowsPerPage,
+                request.IncludeDeleted,
+                request.CategoryID);
+
+            if (postsTable == null || postsTable.Rows.Count == 0)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "No Posts Found",
+                    Detail = request.CategoryID.HasValue
+                        ? $"No posts found for category ID '{request.CategoryID}' on page {request.PageNumber}."
+                        : $"No posts found on page {request.PageNumber}.",
+                    Status = 404
+                });
+            }
+
+            // Get total count from the TotalRows column
+            int totalCount = postsTable.GetTotalRows();
+
+            // Map DataTable to response list
+            var items = postsTable.ToListingResponseList();
+
+            // Create paginated response
+            var response = PaginatedResponse<PostListingResponse>.Create(
+                items,
+                request.PageNumber,
+                request.RowsPerPage,
+                totalCount);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Retrieves a post by ID
+        /// </summary>
+        /// <param name="id">The post ID</param>
+        /// <returns>The post details</returns>
+        [HttpGet("{id:int}", Name = "GetPostById")]
+        [EndpointSummary("Retrieves a post by ID")]
+        [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<PostResponse> GetById(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            Post post = Post.Find(id);
+
+            if (post == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{id}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return Ok(post.PostModel.ToResponse());
+        }
+
+        /// <summary>
+        /// Retrieves complete post details including owner, reviews, and images
+        /// </summary>
+        /// <param name="id">The post ID</param>
+        /// <returns>Complete post details with all related data</returns>
+        /// <remarks>
+        /// This endpoint returns comprehensive post information including:
+        /// - Post details (title, description, price, status)
+        /// - Owner information (username, email, full name, role)
+        /// - Category information
+        /// - All reviews with reviewer details
+        /// - All images
+        /// - Computed values (review count, average rating, image count)
+        /// 
+        /// For individual resource management, use:
+        /// - Reviews: GET /api/posts/{id}/reviews
+        /// - Images: GET /api/posts/{id}/images
+        /// </remarks>
+        [HttpGet("{id:int}/details", Name = "GetPostDetails")]
+        [EndpointSummary("Retrieves complete post details")]
+        [ProducesResponseType(typeof(PostDetailsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<PostDetailsResponse> GetDetails(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            var postData = PostDetails.GetPostDetailsAll(id);
+
+            if (!postData.HasData)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{id}' or it has been deleted.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var response = postData.ToDetailsResponse();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Checks if a post exists
+        /// </summary>
+        /// <param name="id">The post ID to check</param>
+        /// <returns>Boolean indicating existence</returns>
+        [HttpGet("{id:int}/exists")]
+        [EndpointSummary("Checks if a post exists")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public ActionResult<bool> Exists(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            return Ok(Post.DoesPostExist(id));
+        }
+
+        #endregion
+
+        #region POST - Posts
+
+        /// <summary>
+        /// Creates a new post (Authenticated users only)
+        /// </summary>
+        /// <param name="request">The post data</param>
+        /// <returns>The created post</returns>
+        [HttpPost]
+        [Authorize]
+        [EndpointSummary("Creates a new post")]
+        [EndpointDescription("Creates a new marketplace listing/post. Requires authentication.")]
+        [ProducesResponseType(typeof(PostResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<PostResponse> Create([FromBody] CreatePostRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Validate CategoryID exists
+            if (!Category.DoesCategoryExist(request.CategoryID))
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Category",
+                    Detail = $"Category with ID '{request.CategoryID}' does not exist.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            // Use authenticated user's ID if not admin, or allow admin to create for any user
+            var currentUserId = User.GetUserId();
+            var postUserId = request.UserID;
+
+            // Non-admin users can only create posts for themselves
+            if (!User.IsAdmin() && postUserId != currentUserId)
+            {
+                postUserId = currentUserId ?? request.UserID;
+            }
+
+            // Validate the UserID exists
+            if (!UserBL.DoesUserExist(postUserId))
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid User",
+                    Detail = $"User with ID '{postUserId}' does not exist.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            Post post = new Post(new PostModel
+            (
+                null,
+                postUserId,
+                request.CategoryID,
+                request.PostTitle,
+                request.PostDescription,
+                request.Price,
+                request.Status,
+                DateTime.UtcNow,
+                false
+            ));
+
+            if (!post.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Creation Failed",
+                    Detail = "An error occurred while creating the post. Please check that all fields are valid.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = post.PostModel.ToResponse();
+
+            return CreatedAtRoute("GetPostById", new { id = response.PostID }, response);
+        }
+
+        #endregion
+
+        #region PUT - Posts
+
+        /// <summary>
+        /// Updates an existing post (Owner or Admin only)
+        /// </summary>
+        /// <param name="id">The post ID</param>
+        /// <param name="request">The updated post data</param>
+        /// <returns>The updated post</returns>
+        [HttpPut("{id:int}")]
+        [Authorize]
+        [EndpointSummary("Updates an existing post")]
+        [EndpointDescription("Updates the details of an existing marketplace listing/post. Users can only update their own posts unless Admin.")]
+        [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<PostResponse> Update(int id, [FromBody] UpdatePostRequest request)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Post post = Post.Find(id);
+
+            if (post == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{id}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            // Check if user is owner or admin
+            if (!User.IsOwnerOrAdmin(post.UserID))
+            {
+                return Forbid();
+            }
+
+            // Non-admin users cannot change post ownership
+            if (!User.IsAdmin() && request.UserID != post.UserID)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Operation Not Allowed",
+                    Detail = "You cannot transfer post ownership.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            post.UserID = request.UserID;
+            post.CategoryID = request.CategoryID;
+            post.PostTitle = request.PostTitle;
+            post.PostDescription = request.PostDescription;
+            post.Price = request.Price;
+            post.Status = request.Status;
+            post.IsDeleted = request.IsDeleted;
+
+            if (!post.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Update Failed",
+                    Detail = "An error occurred while updating the post.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            return Ok(post.PostModel.ToResponse());
+        }
+
+        #endregion
+
+        #region DELETE - Posts
+
+        /// <summary>
+        /// Deletes a post (Owner or Admin only)
+        /// </summary>
+        /// <param name="id">The post ID to delete</param>
+        /// <returns>No content on success</returns>
+        [HttpDelete("{id:int}")]
+        [Authorize]
+        [EndpointSummary("Deletes a post")]
+        [EndpointDescription("Soft deletes a marketplace listing/post. Users can only delete their own posts unless Admin.")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public IActionResult Delete(int id)
+        {
+            if (id < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = $"The provided ID '{id}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            // First check if post exists and get owner
+            Post post = Post.Find(id);
+            if (post == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{id}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            // Check if user is owner or admin
+            if (!User.IsOwnerOrAdmin(post.UserID))
+            {
+                return Forbid();
+            }
+
+            if (!Post.DeletePost(id))
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Delete Failed",
+                    Detail = "An error occurred while deleting the post.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            return NoContent();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region ==================== POST IMAGES ====================
+
+        #region GET - Post Images
+
+        /// <summary>
+        /// Retrieves all images for a specific post
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <returns>List of images for the post</returns>
+        [HttpGet("{postId:int}/images")]
+        [EndpointSummary("Retrieves all images for a post")]
+        [EndpointDescription("Returns all images uploaded for a specific marketplace post.")]
+        [EndpointName("GetPostImages")]
+        [ProducesResponseType(typeof(PostImagesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<PostImagesResponse> GetAllImages(int postId)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!Post.DoesPostExist(postId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var imagesTable = PostImage.GetImagesByPostId(postId);
+            var images = new List<PostImageResponse>();
+
+            foreach (System.Data.DataRow row in imagesTable.Rows)
+            {
+                images.Add(new PostImageResponse
+                {
+                    PostImageID = (int?)row["PostImageID"],
+                    PostID = (int)row["PostID"],
+                    PostImageURL = (string)row["PostImageURL"],
+                    UploadedAt = (DateTime)row["UploadedAt"],
+                    IsDeleted = (bool)row["IsDeleted"]
+                });
+            }
+
+            var response = new PostImagesResponse
+            {
+                PostID = postId,
+                Images = images,
+                TotalCount = images.Count
+            };
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Retrieves a specific image for a post
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <param name="imageId">The image ID</param>
+        /// <returns>The image details</returns>
+        [HttpGet("{postId:int}/images/{imageId:int}", Name = "GetPostImageById")]
+        [EndpointSummary("Retrieves a specific image for a post")]
+        [EndpointDescription("Returns detailed information about a specific post image.")]
+        [EndpointName("GetPostImageById")]
+        [ProducesResponseType(typeof(PostImageResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<PostImageResponse> GetImageById(int postId, int imageId)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (imageId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Image ID",
+                    Detail = $"The provided image ID '{imageId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!Post.DoesPostExist(postId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            PostImage postImage = PostImage.Find(imageId);
+
+            if (postImage == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Image Not Found",
+                    Detail = $"No image found with ID '{imageId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (postImage.PostID != postId)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Image Not Found",
+                    Detail = $"Image '{imageId}' does not belong to post '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return Ok(postImage.PostImageModel.ToResponse());
+        }
+
+        /// <summary>
+        /// Checks if an image exists for a post
+        /// </summary>
+        [HttpGet("{postId:int}/images/{imageId:int}/exists")]
+        [EndpointSummary("Checks if an image exists for a post")]
+        [EndpointDescription("Returns true if the image exists and belongs to the specified post.")]
+        [EndpointName("CheckPostImageExists")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> ImageExists(int postId, int imageId)
+        {
+            if (postId < 1 || imageId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = "Both post ID and image ID must be positive integers.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            var image = PostImage.Find(imageId);
+            bool exists = image != null && image.PostID == postId && !image.IsDeleted;
+
+            return Ok(exists);
+        }
+
+        #endregion
+
+        #region POST - Post Images
+
+        /// <summary>
+        /// Uploads a new image for a post (via file upload)
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <param name="file">The image file</param>
+        /// <returns>The created image record</returns>
+        [HttpPost("{postId:int}/images/upload")]
+        [Authorize]
+        [EndpointSummary("Uploads an image file for a post")]
+        [EndpointDescription("Uploads a new image file for the specified marketplace post. Users can only upload to their own posts unless Admin.")]
+        [EndpointName("UploadPostImage")]
+        [ProducesResponseType(typeof(PostImageUploadResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<PostImageUploadResponse>> UploadImage(int postId, IFormFile file)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            var post = Post.Find(postId);
+            if (post == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (!User.IsOwnerOrAdmin(post.UserID))
+            {
+                return Forbid();
+            }
+
+            var uploadResult = await _imageUploadService.UploadPostImageAsync(file, postId);
+
+            if (!uploadResult.Success)
+            {
+                return BadRequest(new PostImageUploadResponse
+                {
+                    Success = false,
+                    ErrorMessage = uploadResult.ErrorMessage
+                });
+            }
+
+            var postImage = new PostImage(new PostImageModel(
+                null,
+                postId,
+                uploadResult.FileUrl!,
+                DateTime.UtcNow,
+                false
+            ));
+
+            if (!postImage.Save())
+            {
+                _imageUploadService.DeleteImage(uploadResult.FileUrl!);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Save Failed",
+                    Detail = "Image uploaded but failed to save to database.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = new PostImageUploadResponse
+            {
+                Success = true,
+                Image = postImage.PostImageModel.ToResponse(),
+                FileSizeBytes = uploadResult.FileSizeBytes
+            };
+
+            return CreatedAtRoute(
+                "GetPostImageById",
+                new { postId = postId, imageId = response.Image.PostImageID },
+                response);
+        }
+
+        /// <summary>
+        /// Uploads a new image for a post (via Base64)
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <param name="request">The Base64 image data</param>
+        /// <returns>The created image record</returns>
+        [HttpPost("{postId:int}/images/upload-base64")]
+        [Authorize]
+        [EndpointSummary("Uploads an image via Base64 for a post")]
+        [EndpointDescription("Uploads a new image from Base64 encoded data. Users can only upload to their own posts unless Admin.")]
+        [EndpointName("UploadPostImageBase64")]
+        [ProducesResponseType(typeof(PostImageUploadResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<PostImageUploadResponse>> UploadImageBase64(int postId, [FromBody] UploadPostImageBase64Request request)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var post = Post.Find(postId);
+            if (post == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (!User.IsOwnerOrAdmin(post.UserID))
+            {
+                return Forbid();
+            }
+
+            var uploadResult = await _imageUploadService.UploadPostImageFromBase64Async(request.ImageData, postId);
+
+            if (!uploadResult.Success)
+            {
+                return BadRequest(new PostImageUploadResponse
+                {
+                    Success = false,
+                    ErrorMessage = uploadResult.ErrorMessage
+                });
+            }
+
+            var postImage = new PostImage(new PostImageModel(
+                null,
+                postId,
+                uploadResult.FileUrl!,
+                DateTime.UtcNow,
+                false
+            ));
+
+            if (!postImage.Save())
+            {
+                _imageUploadService.DeleteImage(uploadResult.FileUrl!);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Save Failed",
+                    Detail = "Image uploaded but failed to save to database.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = new PostImageUploadResponse
+            {
+                Success = true,
+                Image = postImage.PostImageModel.ToResponse(),
+                FileSizeBytes = uploadResult.FileSizeBytes
+            };
+
+            return CreatedAtRoute(
+                "GetPostImageById",
+                new { postId = postId, imageId = response.Image.PostImageID },
+                response);
+        }
+
+        /// <summary>
+        /// Creates a post image record from an existing URL
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <param name="request">The image URL</param>
+        /// <returns>The created image record</returns>
+        [HttpPost("{postId:int}/images")]
+        [Authorize]
+        [EndpointSummary("Creates a post image from URL")]
+        [EndpointDescription("Creates a new post image record from an existing image URL. Users can only add to their own posts unless Admin.")]
+        [EndpointName("CreatePostImage")]
+        [ProducesResponseType(typeof(PostImageResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<PostImageResponse> CreateImage(int postId, [FromBody] CreatePostImageRequest request)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var post = Post.Find(postId);
+            if (post == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (!User.IsOwnerOrAdmin(post.UserID))
+            {
+                return Forbid();
+            }
+
+            PostImage postImage = new PostImage(new PostImageModel(
+                null,
+                postId,
+                request.PostImageURL,
+                DateTime.UtcNow,
+                false
+            ));
+
+            if (!postImage.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Creation Failed",
+                    Detail = "An error occurred while creating the image record.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = postImage.PostImageModel.ToResponse();
+
+            return CreatedAtRoute("GetPostImageById", new { postId = postId, imageId = response.PostImageID }, response);
+        }
+
+        #endregion
+
+        #region PUT - Post Images
+
+        /// <summary>
+        /// Updates an existing post image (Owner or Admin only)
+        /// </summary>
+        [HttpPut("{postId:int}/images/{imageId:int}")]
+        [Authorize]
+        [EndpointSummary("Updates a post image")]
+        [EndpointDescription("Updates the details of an existing post image. Users can only update their own post images unless Admin.")]
+        [EndpointName("UpdatePostImage")]
+        [ProducesResponseType(typeof(PostImageResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<PostImageResponse> UpdateImage(int postId, int imageId, [FromBody] UpdatePostImageRequest request)
+        {
+            if (postId < 1 || imageId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = "Post ID and Image ID must be positive integers.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var post = Post.Find(postId);
+            if (post == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (!User.IsOwnerOrAdmin(post.UserID))
+            {
+                return Forbid();
+            }
+
+            PostImage postImage = PostImage.Find(imageId);
+
+            if (postImage == null || postImage.PostID != postId)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Image Not Found",
+                    Detail = $"Image '{imageId}' not found or does not belong to post '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            postImage.PostImageURL = request.PostImageURL;
+            postImage.IsDeleted = request.IsDeleted;
+
+            if (!postImage.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Update Failed",
+                    Detail = "An error occurred while updating the image.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            return Ok(postImage.PostImageModel.ToResponse());
+        }
+
+        #endregion
+
+        #region DELETE - Post Images
+
+        /// <summary>
+        /// Deletes a post image (Owner or Admin only)
+        /// </summary>
+        [HttpDelete("{postId:int}/images/{imageId:int}")]
+        [Authorize]
+        [EndpointSummary("Deletes a post image")]
+        [EndpointDescription("Soft deletes an image from a marketplace post. Users can only delete their own post images unless Admin.")]
+        [EndpointName("DeletePostImage")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public IActionResult DeleteImage(int postId, int imageId)
+        {
+            if (postId < 1 || imageId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = "Post ID and Image ID must be positive integers.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            var post = Post.Find(postId);
+            if (post == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (!User.IsOwnerOrAdmin(post.UserID))
+            {
+                return Forbid();
+            }
+
+            var image = PostImage.Find(imageId);
+
+            if (image == null || image.PostID != postId)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Image Not Found",
+                    Detail = $"Image '{imageId}' not found or does not belong to post '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (!PostImage.DeletePostImage(imageId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Delete Failed",
+                    Detail = $"Failed to delete image '{imageId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return NoContent();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region ==================== POST REVIEWS ====================
+
+        #region GET - Post Reviews
+
+        /// <summary>
+        /// Retrieves all reviews for a specific post
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <returns>List of reviews for the post</returns>
+        [HttpGet("{postId:int}/reviews")]
+        [EndpointSummary("Retrieves all reviews for a post")]
+        [EndpointDescription("Returns all reviews submitted for a specific marketplace post.")]
+        [EndpointName("GetPostReviews")]
+        [ProducesResponseType(typeof(PostReviewsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<PostReviewsResponse> GetAllReviews(int postId)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!Post.DoesPostExist(postId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var reviewsTable = Review.GetReviewsByPostId(postId);
+            var reviews = reviewsTable.ToResponseList();
+
+            var response = new PostReviewsResponse
+            {
+                PostID = postId,
+                Reviews = reviews,
+                TotalCount = reviews.Count,
+                AverageRating = reviews.Count > 0
+                    ? Math.Round(reviews.Average(r => r.Rating), 1)
+                    : null
+            };
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Retrieves a specific review for a post
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <param name="reviewId">The review ID</param>
+        /// <returns>The review details</returns>
+        [HttpGet("{postId:int}/reviews/{reviewId:int}", Name = "GetPostReviewById")]
+        [EndpointSummary("Retrieves a specific review for a post")]
+        [EndpointDescription("Returns detailed information about a specific review on a post.")]
+        [EndpointName("GetPostReviewById")]
+        [ProducesResponseType(typeof(ReviewResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public ActionResult<ReviewResponse> GetReviewById(int postId, int reviewId)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (reviewId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Review ID",
+                    Detail = $"The provided review ID '{reviewId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!Post.DoesPostExist(postId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var review = Review.Find(reviewId);
+
+            if (review == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Review Not Found",
+                    Detail = $"No review found with ID '{reviewId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (review.PostID != postId)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Review Not Found",
+                    Detail = $"Review '{reviewId}' does not belong to post '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return Ok(review.ReviewModel.ToResponse());
+        }
+
+        /// <summary>
+        /// Checks if a review exists for a post
+        /// </summary>
+        [HttpGet("{postId:int}/reviews/{reviewId:int}/exists")]
+        [EndpointSummary("Checks if a review exists for a post")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public ActionResult<bool> ReviewExists(int postId, int reviewId)
+        {
+            if (postId < 1 || reviewId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid ID",
+                    Detail = "Both post ID and review ID must be positive integers.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            var review = Review.Find(reviewId);
+            bool exists = review != null && review.PostID == postId && !review.IsDeleted;
+
+            return Ok(exists);
+        }
+
+        #endregion
+
+        #region POST - Post Reviews
+
+        /// <summary>
+        /// Creates a new review for a post
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <param name="request">The review data</param>
+        /// <returns>The created review</returns>
+        [HttpPost("{postId:int}/reviews")]
+        [EndpointSummary("Creates a review for a post")]
+        [EndpointDescription("Adds a new review to the specified marketplace post.")]
+        [EndpointName("CreatePostReview")]
+        [ProducesResponseType(typeof(ReviewResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<ReviewResponse> CreateReview(int postId, [FromBody] CreateReviewRequest request)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!Post.DoesPostExist(postId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var review = new Review(new ReviewModel(
+                null,
+                postId,
+                request.UserID,
+                request.Rating,
+                request.ReviewText,
+                DateTime.UtcNow,
+                false
+            ));
+
+            if (!review.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Creation Failed",
+                    Detail = "An error occurred while creating the review.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            var response = review.ReviewModel.ToResponse();
+
+            return CreatedAtRoute(
+                "GetPostReviewById",
+                new { postId = postId, reviewId = response.ReviewID },
+                response);
+        }
+
+        #endregion
+
+        #region PUT - Post Reviews
+
+        /// <summary>
+        /// Updates an existing review for a post
+        /// </summary>
+        [HttpPut("{postId:int}/reviews/{reviewId:int}")]
+        [EndpointSummary("Updates a review for a post")]
+        [EndpointDescription("Updates the details of an existing review on a post.")]
+        [EndpointName("UpdatePostReview")]
+        [ProducesResponseType(typeof(ReviewResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public ActionResult<ReviewResponse> UpdateReview(int postId, int reviewId, [FromBody] UpdateReviewRequest request)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (reviewId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Review ID",
+                    Detail = $"The provided review ID '{reviewId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!Post.DoesPostExist(postId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var review = Review.Find(reviewId);
+
+            if (review == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Review Not Found",
+                    Detail = $"No review found with ID '{reviewId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (review.PostID != postId)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Review Not Found",
+                    Detail = $"Review '{reviewId}' does not belong to post '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            review.Rating = request.Rating;
+            review.ReviewText = request.ReviewText;
+            review.IsDeleted = request.IsDeleted;
+
+            if (!review.Save())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                {
+                    Title = "Update Failed",
+                    Detail = "An error occurred while updating the review.",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+
+            return Ok(review.ReviewModel.ToResponse());
+        }
+
+        #endregion
+
+        #region DELETE - Post Reviews
+
+        /// <summary>
+        /// Deletes a review from a post
+        /// </summary>
+        [HttpDelete("{postId:int}/reviews/{reviewId:int}")]
+        [EndpointSummary("Deletes a review from a post")]
+        [EndpointDescription("Soft deletes a review from a marketplace post.")]
+        [EndpointName("DeletePostReview")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public IActionResult DeleteReview(int postId, int reviewId)
+        {
+            if (postId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Post ID",
+                    Detail = $"The provided post ID '{postId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (reviewId < 1)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid Review ID",
+                    Detail = $"The provided review ID '{reviewId}' is not valid. ID must be a positive integer.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            if (!Post.DoesPostExist(postId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Post Not Found",
+                    Detail = $"No post found with ID '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            var review = Review.Find(reviewId);
+
+            if (review == null || review.PostID != postId)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Review Not Found",
+                    Detail = $"Review '{reviewId}' not found or does not belong to post '{postId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            if (!Review.DeleteReview(reviewId))
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Delete Failed",
+                    Detail = $"Failed to delete review '{reviewId}'.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return NoContent();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Helper Methods
+
+        private static List<UserPostResponse> MapToUserPostResponsesWithImages(System.Data.DataTable dt)
+        {
+            var posts = new List<UserPostResponse>();
+            foreach (System.Data.DataRow row in dt.Rows)
+            {
+                var postId = (int)row["PostID"];
+                
+                // Get images for this post
+                var imagesTable = PostImage.GetImagesByPostId(postId);
+                var images = new List<PostImageDetailResponse>();
+                foreach (System.Data.DataRow imgRow in imagesTable.Rows)
+                {
+                    images.Add(new PostImageDetailResponse
+                    {
+                        PostImageID = (int)imgRow["PostImageID"],
+                        PostID = (int)imgRow["PostID"],
+                        PostImageURL = (string)imgRow["PostImageURL"],
+                        UploadedAt = (DateTime)imgRow["UploadedAt"]
+                    });
+                }
+
+                var primaryImageUrl = row.Table.Columns.Contains("PrimaryImageUrl") && row["PrimaryImageUrl"] != DBNull.Value
+                    ? (string)row["PrimaryImageUrl"]
+                    : images.FirstOrDefault()?.PostImageURL;
+
+                posts.Add(new UserPostResponse
+                {
+                    PostID = postId,
+                    UserID = (int)row["UserID"],
+                    CategoryID = (int)row["CategoryID"],
+                    CategoryName = row.Table.Columns.Contains("CategoryName") && row["CategoryName"] != DBNull.Value
+                        ? (string)row["CategoryName"] : null,
+                    PostTitle = (string)row["PostTitle"],
+                    PostDescription = row["PostDescription"] == DBNull.Value ? null : (string)row["PostDescription"],
+                    Price = row["Price"] == DBNull.Value ? 0m : Convert.ToDecimal(row["Price"]),
+                    Status = (int)row["Status"],
+                    CreatedAt = (DateTime)row["CreatedAt"],
+                    IsDeleted = (bool)row["IsDeleted"],
+                    PrimaryImageUrl = primaryImageUrl,
+                    Images = images
+                });
+            }
+            return posts;
+        }
+
+        #endregion
+    }
+}

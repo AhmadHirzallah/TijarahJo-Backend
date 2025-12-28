@@ -28,6 +28,11 @@ namespace TijarahJoDBAPI.Controllers
         private const int RoleId_User = 2;
         private const int RoleId_Moderator = 3;
 
+        // User Status constants matching database constraint: Status IN (0, 1, 2)
+        private const int UserStatus_Active = 0;
+        private const int UserStatus_Verified = 1;
+        private const int UserStatus_Banned = 2;
+
         private readonly TokenService _tokenService;
         private readonly JwtOptions _jwtOptions;
         private readonly ISecurityService _securityService;
@@ -236,6 +241,7 @@ namespace TijarahJoDBAPI.Controllers
         [EndpointSummary("Authenticates a user")]
         [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
         {
             if (!ModelState.IsValid)
@@ -243,13 +249,40 @@ namespace TijarahJoDBAPI.Controllers
 
             UserBL? user = UserBL.FindByLogin(request.Login);
             if (user == null)
-                return Unauthorized(new ProblemDetails { Title = "Invalid credentials", Status = 401 });
+                return Unauthorized(new ProblemDetails 
+                { 
+                    Title = "Invalid credentials", 
+                    Detail = "The username/email or password is incorrect.",
+                    Status = 401 
+                });
 
             if (!_securityService.VerifyPassword(user.HashedPassword, request.Password))
-                return Unauthorized(new ProblemDetails { Title = "Invalid credentials", Status = 401 });
+                return Unauthorized(new ProblemDetails 
+                { 
+                    Title = "Invalid credentials", 
+                    Detail = "The username/email or password is incorrect.",
+                    Status = 401 
+                });
 
+            // Check if account is deleted
             if (user.UserID == null || user.IsDeleted)
-                return Unauthorized(new ProblemDetails { Title = "Account disabled", Status = 401 });
+                return Unauthorized(new ProblemDetails 
+                { 
+                    Title = "Account disabled", 
+                    Detail = "This account has been deactivated. Please contact support for assistance.",
+                    Status = 401 
+                });
+
+            // Check if user is banned
+            if (user.Status == UserStatus_Banned)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetails
+                {
+                    Title = "Account Banned",
+                    Detail = "Your account has been banned. Please contact support for more information.",
+                    Status = StatusCodes.Status403Forbidden
+                });
+            }
 
             if (_securityService.NeedsRehash(user.HashedPassword))
             {

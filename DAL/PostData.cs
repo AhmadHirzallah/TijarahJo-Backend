@@ -126,28 +126,32 @@ namespace TijarahJoDB.DAL
 
 		public static bool DeletePost(int? PostID)
 		{
-			int rowsAffected = 0;
-
 			try
 			{
 				using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
 				{
-					using (SqlCommand command = new SqlCommand("SP_DeletePost", connection))
+					// Use direct SQL instead of stored procedure for more control
+					using (SqlCommand command = new SqlCommand(@"
+						UPDATE TbPosts 
+						SET IsDeleted = 1 
+						WHERE PostID = @PostID AND IsDeleted = 0;
+						SELECT @@ROWCOUNT;", connection))
 					{
-						command.CommandType = CommandType.StoredProcedure;
+						command.CommandType = CommandType.Text;
 						command.Parameters.AddWithValue("@PostID", PostID);
 
 						connection.Open();
-						rowsAffected = (int)command.ExecuteScalar();
+						var result = command.ExecuteScalar();
+						int rowsAffected = result != null ? (int)result : 0;
+						return rowsAffected > 0;
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				// Log exception
+				System.Diagnostics.Debug.WriteLine($"DeletePost Error: {ex.Message}");
+				return false;
 			}
-
-			return (rowsAffected > 0);
 		}
 
 		public static bool DoesPostExist(int? PostID)

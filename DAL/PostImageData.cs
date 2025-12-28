@@ -215,9 +215,69 @@ namespace TijarahJoDB.DAL
 			catch (Exception ex)
 			{
 				// Log exception
+				System.Diagnostics.Debug.WriteLine($"GetImagesByPostId Error: {ex.Message}");
 			}
 
 			return dt;
+		}
+
+		/// <summary>
+		/// Soft deletes all images for a specific post
+		/// </summary>
+		/// <param name="postId">The post ID</param>
+		/// <returns>Number of images deleted</returns>
+		public static int SoftDeleteImagesByPostId(int postId)
+		{
+			try
+			{
+				using var connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+				using var command = new SqlCommand(@"
+					UPDATE TbPostImages 
+					SET IsDeleted = 1 
+					WHERE PostID = @PostID AND IsDeleted = 0;
+					SELECT @@ROWCOUNT;", connection);
+
+				command.CommandType = CommandType.Text;
+				command.Parameters.Add("@PostID", SqlDbType.Int).Value = postId;
+
+				connection.Open();
+				var result = command.ExecuteScalar();
+				return result != null ? (int)result : 0;
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine($"SoftDeleteImagesByPostId Error: {ex.Message}");
+				return -1;
+			}
+		}
+
+		/// <summary>
+		/// Hard deletes all images for a specific post (use with caution)
+		/// </summary>
+		/// <param name="postId">The post ID</param>
+		/// <returns>Number of images deleted</returns>
+		public static int HardDeleteImagesByPostId(int postId)
+		{
+			try
+			{
+				using var connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+				using var command = new SqlCommand(@"
+					DELETE FROM TbPostImages 
+					WHERE PostID = @PostID;
+					SELECT @@ROWCOUNT;", connection);
+
+				command.CommandType = CommandType.Text;
+				command.Parameters.Add("@PostID", SqlDbType.Int).Value = postId;
+
+				connection.Open();
+				var result = command.ExecuteScalar();
+				return result != null ? (int)result : 0;
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine($"HardDeleteImagesByPostId Error: {ex.Message}");
+				return -1;
+			}
 		}
 	}
 }

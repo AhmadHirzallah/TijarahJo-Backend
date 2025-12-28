@@ -133,6 +133,14 @@ namespace TijarahJoDB.BLL
         public static DataTable GetReviewsByPostId(int postId)
             => ReviewData.GetReviewsByPostId(postId);
 
+        /// <summary>
+        /// Soft deletes all reviews for a specific post
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <returns>Number of reviews deleted, -1 on error</returns>
+        public static int SoftDeleteByPostId(int postId)
+            => ReviewData.SoftDeleteReviewsByPostId(postId);
+
         #endregion
     }
 }

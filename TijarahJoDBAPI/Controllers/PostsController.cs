@@ -503,15 +503,20 @@ namespace TijarahJoDBAPI.Controllers
         /// </summary>
         /// <param name="id">The post ID to delete</param>
         /// <returns>No content on success</returns>
+        /// <remarks>
+        /// This performs a soft delete (sets IsDeleted = true).
+        /// It also soft-deletes all related images and reviews.
+        /// </remarks>
         [HttpDelete("{id:int}")]
         [Authorize]
         [EndpointSummary("Deletes a post")]
-        [EndpointDescription("Soft deletes a marketplace listing/post. Users can only delete their own posts unless Admin.")]
+        [EndpointDescription("Soft deletes a marketplace listing/post along with its images and reviews. Users can only delete their own posts unless Admin.")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public IActionResult Delete(int id)
         {
             if (id < 1)
@@ -542,17 +547,54 @@ namespace TijarahJoDBAPI.Controllers
                 return Forbid();
             }
 
-            if (!Post.DeletePost(id))
+            try
+            {
+                // Step 1: Soft delete all images for this post
+                int imagesDeleted = PostImage.SoftDeleteByPostId(id);
+                if (imagesDeleted < 0)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                    {
+                        Title = "Delete Failed",
+                        Detail = "Failed to delete post images.",
+                        Status = StatusCodes.Status500InternalServerError
+                    });
+                }
+
+                // Step 2: Soft delete all reviews for this post
+                int reviewsDeleted = Review.SoftDeleteByPostId(id);
+                if (reviewsDeleted < 0)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                    {
+                        Title = "Delete Failed",
+                        Detail = "Failed to delete post reviews.",
+                        Status = StatusCodes.Status500InternalServerError
+                    });
+                }
+
+                // Step 3: Soft delete the post itself
+                if (!Post.DeletePost(id))
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                    {
+                        Title = "Delete Failed",
+                        Detail = "An error occurred while deleting the post.",
+                        Status = StatusCodes.Status500InternalServerError
+                    });
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
                 {
                     Title = "Delete Failed",
-                    Detail = "An error occurred while deleting the post.",
+                    Detail = $"An unexpected error occurred: {ex.Message}",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
-
-            return NoContent();
         }
 
         #endregion

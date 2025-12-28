@@ -224,9 +224,40 @@ namespace TijarahJoDB.DAL
             catch (Exception ex)
             {
                 // Log exception
+                System.Diagnostics.Debug.WriteLine($"GetReviewsByPostId Error: {ex.Message}");
             }
 
             return dt;
+        }
+
+        /// <summary>
+        /// Soft deletes all reviews for a specific post
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <returns>Number of reviews deleted</returns>
+        public static int SoftDeleteReviewsByPostId(int postId)
+        {
+            try
+            {
+                using var connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+                using var command = new SqlCommand(@"
+                    UPDATE TbPostReviews 
+                    SET IsDeleted = 1 
+                    WHERE PostID = @PostID AND IsDeleted = 0;
+                    SELECT @@ROWCOUNT;", connection);
+
+                command.CommandType = CommandType.Text;
+                command.Parameters.Add("@PostID", SqlDbType.Int).Value = postId;
+
+                connection.Open();
+                var result = command.ExecuteScalar();
+                return result != null ? (int)result : 0;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"SoftDeleteReviewsByPostId Error: {ex.Message}");
+                return -1;
+            }
         }
     }
 }

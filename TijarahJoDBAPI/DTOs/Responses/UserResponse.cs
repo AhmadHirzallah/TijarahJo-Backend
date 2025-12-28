@@ -21,4 +21,16 @@ public class UserResponse
     public string FullName => string.IsNullOrEmpty(LastName) 
         ? FirstName 
         : $"{FirstName} {LastName}";
+
+    /// <summary>
+    /// Human-readable status name
+    /// Status values: 0 = Active, 1 = Verified, 2 = Banned
+    /// </summary>
+    public string StatusName => Status switch
+    {
+        0 => "Active",
+        1 => "Verified",
+        2 => "Banned",
+        _ => "Unknown"
+    };
 }

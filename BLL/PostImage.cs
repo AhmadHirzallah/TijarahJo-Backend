@@ -72,16 +72,36 @@ namespace TijarahJoDB.BLL
 			}
 			return false;
 		}
+
 		public static bool DeletePostImage(int? PostImageID)
 			=> PostImageData.DeletePostImage(PostImageID);
+
 		public static bool DoesPostImageExist(int? PostImageID)
 			=> PostImageData.DoesPostImageExist(PostImageID);
+
 		public static DataTable GetAllTbPostImages()
 			=> PostImageData.GetAllTbPostImages();
+
 		/// <summary>
 		/// Gets all images for a specific post
 		/// </summary>
 		public static DataTable GetImagesByPostId(int postId)
 			=> PostImageData.GetImagesByPostId(postId);
+
+		/// <summary>
+		/// Soft deletes all images for a specific post
+		/// </summary>
+		/// <param name="postId">The post ID</param>
+		/// <returns>Number of images deleted, -1 on error</returns>
+		public static int SoftDeleteByPostId(int postId)
+			=> PostImageData.SoftDeleteImagesByPostId(postId);
+
+		/// <summary>
+		/// Hard deletes all images for a specific post (use with caution)
+		/// </summary>
+		/// <param name="postId">The post ID</param>
+		/// <returns>Number of images deleted, -1 on error</returns>
+		public static int HardDeleteByPostId(int postId)
+			=> PostImageData.HardDeleteImagesByPostId(postId);
 	}
 }

@@ -1,31 +1,33 @@
 -- ============================================================
 -- TIJARAHJO: FIX CASCADE DELETE FOR POSTS
 -- ============================================================
--- This script fixes the issue where deleting a post with images fails
--- because of foreign key constraints.
+-- ISSUE: Stored procedures SP_DeletePost, SP_DeletePostCascade, 
+--        and SP_DeleteReview reference "TbReviews" but the actual 
+--        table is named "TbPostReviews"
+--
+-- RUN THIS SCRIPT IN SQL SERVER MANAGEMENT STUDIO (SSMS)
 -- ============================================================
 
-USE TijarahJoDB; -- Change to your database name
+USE TijarahJoDB;
 GO
 
--- ============================================================
--- OPTION 1: UPDATE STORED PROCEDURE (RECOMMENDED)
--- This is the safest approach - delete child records first
--- ============================================================
+PRINT '============================================================'
+PRINT 'FIXING STORED PROCEDURES WITH WRONG TABLE NAME'
+PRINT 'TbReviews -> TbPostReviews'
+PRINT '============================================================'
+PRINT ''
 
--- First, let's see what the current SP_DeletePost looks like
-PRINT 'Current SP_DeletePost definition:'
-PRINT OBJECT_DEFINITION(OBJECT_ID('SP_DeletePost'));
-GO
-
--- Drop and recreate with cascade logic
+-- ============================================================
+-- FIX 1: SP_DeletePost
+-- ============================================================
 IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'SP_DeletePost')
 BEGIN
     DROP PROCEDURE SP_DeletePost;
+    PRINT 'Dropped old SP_DeletePost';
 END
 GO
 
-CREATE PROCEDURE SP_DeletePost
+CREATE PROCEDURE [dbo].[SP_DeletePost]
     @PostID INT
 AS
 BEGIN
@@ -34,20 +36,21 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
         
-        -- Step 1: Delete all images for this post first
+        -- Step 1: Soft delete all images for this post
         UPDATE TbPostImages 
         SET IsDeleted = 1 
-        WHERE PostID = @PostID;
+        WHERE PostID = @PostID AND IsDeleted = 0;
         
-        -- Step 2: Delete all reviews for this post
-        UPDATE TbReviews 
+        -- Step 2: Soft delete all reviews for this post
+        -- FIXED: Changed from TbReviews to TbPostReviews
+        UPDATE TbPostReviews 
         SET IsDeleted = 1 
-        WHERE PostID = @PostID;
+        WHERE PostID = @PostID AND IsDeleted = 0;
         
         -- Step 3: Soft delete the post itself
         UPDATE TbPosts 
         SET IsDeleted = 1 
-        WHERE PostID = @PostID;
+        WHERE PostID = @PostID AND IsDeleted = 0;
         
         -- Return number of affected rows
         SELECT @@ROWCOUNT AS RowsAffected;
@@ -60,60 +63,24 @@ BEGIN
             
         -- Return 0 to indicate failure
         SELECT 0 AS RowsAffected;
-        
-        -- Optionally log the error
-        -- INSERT INTO ErrorLog (ErrorMessage, ErrorProcedure, ErrorLine)
-        -- VALUES (ERROR_MESSAGE(), ERROR_PROCEDURE(), ERROR_LINE());
     END CATCH
 END
 GO
 
-PRINT 'SP_DeletePost updated successfully!'
+PRINT 'Created SP_DeletePost with correct table name';
 GO
 
 -- ============================================================
--- OPTION 2: ADD CASCADE DELETE TO FOREIGN KEY
--- This automatically deletes child records when parent is deleted
--- Use this if you want HARD deletes to cascade
+-- FIX 2: SP_DeletePostCascade
 -- ============================================================
-
-/*
--- First, find and drop the existing FK constraint
-DECLARE @fkName NVARCHAR(200);
-SELECT @fkName = fk.name
-FROM sys.foreign_keys fk
-JOIN sys.foreign_key_columns fkc ON fk.object_id = fkc.constraint_object_id
-WHERE OBJECT_NAME(fk.parent_object_id) = 'TbPostImages'
-  AND OBJECT_NAME(fk.referenced_object_id) = 'TbPosts';
-
-IF @fkName IS NOT NULL
-BEGIN
-    EXEC('ALTER TABLE TbPostImages DROP CONSTRAINT ' + @fkName);
-    PRINT 'Dropped FK: ' + @fkName;
-END
-
--- Recreate with CASCADE DELETE
-ALTER TABLE TbPostImages
-ADD CONSTRAINT FK_PostImages_Posts
-FOREIGN KEY (PostID) REFERENCES TbPosts(PostID)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
-
-PRINT 'FK recreated with CASCADE DELETE'
-*/
-
--- ============================================================
--- OPTION 3: CREATE A COMPREHENSIVE DELETE PROCEDURE
--- For when you need to delete everything related to a post
--- ============================================================
-
 IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'SP_DeletePostCascade')
 BEGIN
     DROP PROCEDURE SP_DeletePostCascade;
+    PRINT 'Dropped old SP_DeletePostCascade';
 END
 GO
 
-CREATE PROCEDURE SP_DeletePostCascade
+CREATE PROCEDURE [dbo].[SP_DeletePostCascade]
     @PostID INT,
     @HardDelete BIT = 0  -- 0 = soft delete, 1 = hard delete
 AS
@@ -128,32 +95,26 @@ BEGIN
         IF @HardDelete = 1
         BEGIN
             -- HARD DELETE - permanently remove records
-            
-            -- Delete images first (child table)
             DELETE FROM TbPostImages WHERE PostID = @PostID;
             
-            -- Delete reviews (child table)
-            DELETE FROM TbReviews WHERE PostID = @PostID;
+            -- FIXED: Changed from TbReviews to TbPostReviews
+            DELETE FROM TbPostReviews WHERE PostID = @PostID;
             
-            -- Delete the post itself
             DELETE FROM TbPosts WHERE PostID = @PostID;
             SET @RowsAffected = @@ROWCOUNT;
         END
         ELSE
         BEGIN
             -- SOFT DELETE - mark as deleted
-            
-            -- Soft delete images
             UPDATE TbPostImages 
             SET IsDeleted = 1 
             WHERE PostID = @PostID AND IsDeleted = 0;
             
-            -- Soft delete reviews
-            UPDATE TbReviews 
+            -- FIXED: Changed from TbReviews to TbPostReviews
+            UPDATE TbPostReviews 
             SET IsDeleted = 1 
             WHERE PostID = @PostID AND IsDeleted = 0;
             
-            -- Soft delete the post
             UPDATE TbPosts 
             SET IsDeleted = 1 
             WHERE PostID = @PostID AND IsDeleted = 0;
@@ -169,45 +130,57 @@ BEGIN
             ROLLBACK TRANSACTION;
             
         SELECT 0 AS RowsAffected;
-        
-        -- For debugging, you can also return error info:
-        -- SELECT ERROR_MESSAGE() AS ErrorMessage, ERROR_LINE() AS ErrorLine;
     END CATCH
 END
 GO
 
-PRINT 'SP_DeletePostCascade created successfully!'
+PRINT 'Created SP_DeletePostCascade with correct table name';
 GO
 
 -- ============================================================
--- VERIFICATION: Test the fix
+-- FIX 3: SP_DeleteReview
 -- ============================================================
-/*
--- Test with a post that has images (replace 1 with actual PostID)
-EXEC SP_DeletePost @PostID = 1;
+IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'SP_DeleteReview')
+BEGIN
+    DROP PROCEDURE SP_DeleteReview;
+    PRINT 'Dropped old SP_DeleteReview';
+END
+GO
 
--- Check results
-SELECT * FROM TbPosts WHERE PostID = 1;
-SELECT * FROM TbPostImages WHERE PostID = 1;
-SELECT * FROM TbReviews WHERE PostID = 1;
-*/
+CREATE PROCEDURE [dbo].[SP_DeleteReview]
+    @ReviewID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- FIXED: Changed from TbReviews to TbPostReviews
+    UPDATE TbPostReviews 
+    SET IsDeleted = 1 
+    WHERE ReviewID = @ReviewID;
+    
+    SELECT @@ROWCOUNT AS RowsAffected;
+END
+GO
+
+PRINT 'Created SP_DeleteReview with correct table name';
+GO
 
 -- ============================================================
--- ALSO FIX: SP_DeletePostImage (in case it has issues too)
+-- FIX 4: SP_DeletePostImage (ensure it uses soft delete)
 -- ============================================================
 IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'SP_DeletePostImage')
 BEGIN
     DROP PROCEDURE SP_DeletePostImage;
+    PRINT 'Dropped old SP_DeletePostImage';
 END
 GO
 
-CREATE PROCEDURE SP_DeletePostImage
+CREATE PROCEDURE [dbo].[SP_DeletePostImage]
     @PostImageID INT
 AS
 BEGIN
     SET NOCOUNT ON;
     
-    -- Soft delete the image
     UPDATE TbPostImages 
     SET IsDeleted = 1 
     WHERE PostImageID = @PostImageID;
@@ -216,45 +189,48 @@ BEGIN
 END
 GO
 
-PRINT 'SP_DeletePostImage updated successfully!'
+PRINT 'Created SP_DeletePostImage';
 GO
 
 -- ============================================================
--- ALSO FIX: SP_DeleteReview (in case it has issues too)
+-- VERIFICATION: Check the fixes
 -- ============================================================
-IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'SP_DeleteReview')
-BEGIN
-    DROP PROCEDURE SP_DeleteReview;
-END
-GO
+PRINT ''
+PRINT '============================================================'
+PRINT 'VERIFICATION'
+PRINT '============================================================'
 
-CREATE PROCEDURE SP_DeleteReview
-    @ReviewID INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    -- Soft delete the review
-    UPDATE TbReviews 
-    SET IsDeleted = 1 
-    WHERE ReviewID = @ReviewID;
-    
-    SELECT @@ROWCOUNT AS RowsAffected;
-END
-GO
+-- Show updated procedures
+SELECT 
+    name AS ProcedureName,
+    modify_date AS LastModified
+FROM sys.procedures
+WHERE name IN ('SP_DeletePost', 'SP_DeletePostCascade', 'SP_DeleteReview', 'SP_DeletePostImage')
+ORDER BY name;
 
-PRINT 'SP_DeleteReview updated successfully!'
-GO
+-- Verify table exists
+IF EXISTS (SELECT 1 FROM sys.tables WHERE name = 'TbPostReviews')
+    PRINT '? Table TbPostReviews exists'
+ELSE
+    PRINT '? ERROR: Table TbPostReviews does NOT exist!'
+
+IF EXISTS (SELECT 1 FROM sys.tables WHERE name = 'TbReviews')
+    PRINT '? WARNING: Old table TbReviews still exists (not used)'
+ELSE
+    PRINT '? No old TbReviews table (correct)'
 
 PRINT ''
 PRINT '============================================================'
 PRINT 'ALL FIXES APPLIED SUCCESSFULLY!'
 PRINT '============================================================'
-PRINT 'The delete operation should now work for posts with images.'
 PRINT ''
 PRINT 'What was fixed:'
-PRINT '1. SP_DeletePost now soft-deletes images and reviews before the post'
-PRINT '2. SP_DeletePostCascade created for more control (hard/soft delete)'
-PRINT '3. SP_DeletePostImage updated to use soft delete'
-PRINT '4. SP_DeleteReview updated to use soft delete'
+PRINT '1. SP_DeletePost - now uses TbPostReviews instead of TbReviews'
+PRINT '2. SP_DeletePostCascade - now uses TbPostReviews instead of TbReviews'
+PRINT '3. SP_DeleteReview - now uses TbPostReviews instead of TbReviews'
+PRINT '4. SP_DeletePostImage - confirmed to use soft delete'
+PRINT ''
+PRINT 'Next steps:'
+PRINT '1. Restart your API application'
+PRINT '2. Test deleting a post with images'
 PRINT '============================================================'
