@@ -5,3 +5,11 @@ TijarahJo-Backend/.vs/
 # Build output
 bin/
 obj/
+
+# Visual Studio / VS workspace
+.vs/
+*.suo
+
+# Copilot / VS indices (if applicable)
+**/CopilotIndices/
+
