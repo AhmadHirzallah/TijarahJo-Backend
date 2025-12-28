@@ -43,6 +43,11 @@ public static class PostDetailsMapper
                 ? null 
                 : postRow["OwnerLastName"] as string,
             OwnerFullName = postRow["OwnerFullName"] as string,
+            
+            // Owner Phone - for WhatsApp contact
+            OwnerPrimaryPhone = postRow.Table.Columns.Contains("OwnerPrimaryPhone") && postRow["OwnerPrimaryPhone"] != DBNull.Value
+                ? postRow["OwnerPrimaryPhone"] as string
+                : null,
 
             // Role Info
             RoleID = postRow["RoleID"] as int?,

@@ -26,6 +26,11 @@ public class PostDetailsResponse
     public string? OwnerLastName { get; set; }
     public string? OwnerFullName { get; set; }
 
+    /// <summary>
+    /// Owner's primary phone number for WhatsApp contact
+    /// </summary>
+    public string? OwnerPrimaryPhone { get; set; }
+
     #endregion
 
     #region Role Info
@@ -79,6 +84,20 @@ public class PostDetailsResponse
     /// Primary image URL (first image)
     /// </summary>
     public string? PrimaryImageUrl => Images.FirstOrDefault()?.PostImageURL;
+
+    /// <summary>
+    /// Indicates if the owner has a phone number available for contact
+    /// </summary>
+    public bool HasOwnerPhone => !string.IsNullOrEmpty(OwnerPrimaryPhone);
+
+    /// <summary>
+    /// WhatsApp deep link URL for contacting the owner
+    /// Format: https://wa.me/{phoneNumber}
+    /// Returns null if no phone number available
+    /// </summary>
+    public string? WhatsAppLink => HasOwnerPhone 
+        ? $"https://wa.me/{OwnerPrimaryPhone?.Replace("+", "").Replace(" ", "").Replace("-", "")}" 
+        : null;
 
     #endregion
 }
